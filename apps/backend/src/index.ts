@@ -1,10 +1,16 @@
 import express from 'express';
 
+import authRoutes from './routes/auth';
+import sweetsRoutes from './routes/sweets';
+
 const app = express();
 app.use(express.json());
 
-// NOTE: health route intentionally NOT implemented yet (for RED test)
-// Implementing health route (Stage 1: GREEN)
+// API routes
+app.use('/api/auth', authRoutes);
+app.use('/api/sweets', sweetsRoutes);
+
+// Health route
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok' });
 });
