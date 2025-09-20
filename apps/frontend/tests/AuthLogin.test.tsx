@@ -1,6 +1,7 @@
+import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { vi, describe, it, expect } from 'vitest';
-import AuthLogin from './AuthLogin';
+import AuthLogin from '../src/AuthLogin';
 
 global.fetch = vi.fn(() =>
   Promise.resolve({

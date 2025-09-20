@@ -1,5 +1,6 @@
+import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import AuthRegister from './AuthRegister';
+import AuthRegister from '../src/AuthRegister';
 import { vi, describe, it, expect } from 'vitest';
 
 global.fetch = vi.fn(() =>

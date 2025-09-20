@@ -7,14 +7,17 @@ import app from '../src/index';
 // Mock the database for testing
 vi.mock('../src/db', () => {
   const mockSweets = [
-    { id: 'sweet-1', name: 'Existing Sweet', category: 'Test', price: 2.5, quantity: 10 },
+    { id: 'sweet-1', name: 'Chocolate Bar', category: 'Chocolate', price: 2.5, quantity: 10 },
+    { id: 'sweet-2', name: 'Vanilla Cake', category: 'Cake', price: 5.0, quantity: 5 },
+    { id: 'sweet-3', name: 'Dark Chocolate', category: 'Chocolate', price: 3.0, quantity: 8 },
+    { id: 'sweet-4', name: 'Strawberry Candy', category: 'Candy', price: 1.5, quantity: 20 },
   ];
 
   return {
     db: {
       select: vi.fn(() => ({
         from: vi.fn(() => ({
-          where: vi.fn(() => Promise.resolve([])),
+          where: vi.fn(() => Promise.resolve(mockSweets)),
         })),
       })),
       insert: vi.fn(() => ({
@@ -138,7 +141,7 @@ describe('Stage 4: Sweets CRUD with Admin Authorization', () => {
 
     it('should return 409 for duplicate sweet name', async () => {
       const duplicateData = {
-        name: 'Existing Sweet', // This name already exists
+        name: 'Chocolate Bar', // This name already exists in mock data
         category: 'Test',
         price: 1.99,
         quantity: 5,
@@ -241,6 +244,141 @@ describe('Stage 4: Sweets CRUD with Admin Authorization', () => {
 
       expect(res.body.success).toBe(false);
       expect(res.body.message).toBe('Sweet not found');
+    });
+  });
+});
+
+describe('Stage 5: Sweets List & Search', () => {
+  let userToken: string;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+
+    // Generate test token (search should be available to all authenticated users)
+    userToken = jwt.sign(
+      { id: 'user-id', email: 'user@example.com', role: 'user' },
+      process.env.JWT_SECRET || 'test-secret',
+      { expiresIn: '1h' }
+    );
+  });
+
+  describe('GET /api/sweets - List All Sweets', () => {
+    it('should return all sweets for authenticated user', async () => {
+      const res = await request(app)
+        .get('/api/sweets')
+        .set('Authorization', `Bearer ${userToken}`)
+        .expect(200);
+
+      expect(res.body.success).toBe(true);
+      expect(res.body.sweets).toBeDefined();
+      expect(Array.isArray(res.body.sweets)).toBe(true);
+    });
+
+    it('should return 401 when no token provided', async () => {
+      const res = await request(app).get('/api/sweets').expect(401);
+
+      expect(res.body.error).toBe('Unauthorized');
+      expect(res.body.message).toBe('No token provided');
+    });
+  });
+
+  describe('GET /api/sweets/search - Search with Filters', () => {
+    it('should search by name (case-insensitive substring)', async () => {
+      const res = await request(app)
+        .get('/api/sweets/search?name=chocolate')
+        .set('Authorization', `Bearer ${userToken}`)
+        .expect(200);
+
+      expect(res.body.success).toBe(true);
+      expect(res.body.sweets).toBeDefined();
+      expect(Array.isArray(res.body.sweets)).toBe(true);
+    });
+
+    it('should search by category', async () => {
+      const res = await request(app)
+        .get('/api/sweets/search?category=Chocolate')
+        .set('Authorization', `Bearer ${userToken}`)
+        .expect(200);
+
+      expect(res.body.success).toBe(true);
+      expect(res.body.sweets).toBeDefined();
+    });
+
+    it('should search by minimum price', async () => {
+      const res = await request(app)
+        .get('/api/sweets/search?minPrice=2.0')
+        .set('Authorization', `Bearer ${userToken}`)
+        .expect(200);
+
+      expect(res.body.success).toBe(true);
+      expect(res.body.sweets).toBeDefined();
+    });
+
+    it('should search by maximum price', async () => {
+      const res = await request(app)
+        .get('/api/sweets/search?maxPrice=3.0')
+        .set('Authorization', `Bearer ${userToken}`)
+        .expect(200);
+
+      expect(res.body.success).toBe(true);
+      expect(res.body.sweets).toBeDefined();
+    });
+
+    it('should search by price range (minPrice and maxPrice)', async () => {
+      const res = await request(app)
+        .get('/api/sweets/search?minPrice=2.0&maxPrice=4.0')
+        .set('Authorization', `Bearer ${userToken}`)
+        .expect(200);
+
+      expect(res.body.success).toBe(true);
+      expect(res.body.sweets).toBeDefined();
+    });
+
+    it('should combine multiple filters (name, category, price)', async () => {
+      const res = await request(app)
+        .get('/api/sweets/search?name=chocolate&category=Chocolate&minPrice=2.0')
+        .set('Authorization', `Bearer ${userToken}`)
+        .expect(200);
+
+      expect(res.body.success).toBe(true);
+      expect(res.body.sweets).toBeDefined();
+    });
+
+    it('should return empty array when no matches found', async () => {
+      const res = await request(app)
+        .get('/api/sweets/search?name=nonexistent')
+        .set('Authorization', `Bearer ${userToken}`)
+        .expect(200);
+
+      expect(res.body.success).toBe(true);
+      expect(res.body.sweets).toEqual([]);
+    });
+
+    it('should return 400 for invalid price parameters', async () => {
+      const res = await request(app)
+        .get('/api/sweets/search?minPrice=invalid')
+        .set('Authorization', `Bearer ${userToken}`)
+        .expect(400);
+
+      expect(res.body.success).toBe(false);
+      expect(res.body.message).toContain('Invalid');
+    });
+
+    it('should return 400 when minPrice > maxPrice', async () => {
+      const res = await request(app)
+        .get('/api/sweets/search?minPrice=5.0&maxPrice=2.0')
+        .set('Authorization', `Bearer ${userToken}`)
+        .expect(400);
+
+      expect(res.body.success).toBe(false);
+      expect(res.body.message).toContain('minimum price cannot be greater than maximum price');
+    });
+
+    it('should return 401 when no token provided', async () => {
+      const res = await request(app).get('/api/sweets/search?name=chocolate').expect(401);
+
+      expect(res.body.error).toBe('Unauthorized');
+      expect(res.body.message).toBe('No token provided');
     });
   });
 });

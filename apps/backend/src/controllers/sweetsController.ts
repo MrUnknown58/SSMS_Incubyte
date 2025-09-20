@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { validationResult } from 'express-validator';
-import { eq, like, and, gte, lte } from 'drizzle-orm';
+import { eq, like, ilike, and, gte, lte } from 'drizzle-orm';
 
 import { db, sweets, purchases, type NewSweet, type NewPurchase } from '../db';
 
@@ -72,16 +72,41 @@ export const searchSweets = async (req: Request, res: Response) => {
   try {
     const { name, category, minPrice, maxPrice } = req.query;
 
+    // Validate price parameters
+    if (minPrice && isNaN(Number(minPrice))) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid minPrice parameter',
+      });
+    }
+
+    if (maxPrice && isNaN(Number(maxPrice))) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid maxPrice parameter',
+      });
+    }
+
+    if (minPrice && maxPrice && Number(minPrice) > Number(maxPrice)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid price range: minimum price cannot be greater than maximum price',
+      });
+    }
+
     const conditions = [];
 
-    if (name) {
-      conditions.push(like(sweets.name, `%${name}%`));
+    // Case-insensitive substring search for name (ILIKE)
+    if (name && typeof name === 'string') {
+      conditions.push(ilike(sweets.name, `%${name}%`));
     }
 
-    if (category) {
-      conditions.push(like(sweets.category, `%${category}%`));
+    // Exact category match
+    if (category && typeof category === 'string') {
+      conditions.push(eq(sweets.category, category));
     }
 
+    // Price range filtering
     if (minPrice) {
       conditions.push(gte(sweets.price, String(minPrice)));
     }
@@ -168,7 +193,7 @@ export const updateSweet = async (req: Request, res: Response) => {
 };
 
 // Delete sweet (Admin only)
-export const deleteSweet = async (req: AuthenticatedRequest, res: Response) => {
+export const deleteSweet = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
@@ -263,7 +288,7 @@ export const purchaseSweet = async (req: Request, res: Response) => {
 };
 
 // Restock sweet (Admin only)
-export const restockSweet = async (req: AuthenticatedRequest, res: Response) => {
+export const restockSweet = async (req: Request, res: Response) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {

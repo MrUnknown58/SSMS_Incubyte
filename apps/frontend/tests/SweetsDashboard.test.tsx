@@ -1,5 +1,6 @@
+import React from 'react';
 import { render, screen } from '@testing-library/react';
-import SweetsDashboard from './SweetsDashboard';
+import SweetsDashboard from '../src/SweetsDashboard';
 import { vi, describe, it, expect } from 'vitest';
 
 global.fetch = vi.fn(() =>

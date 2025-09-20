@@ -1,5 +1,6 @@
+import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import AdminPanel from './AdminPanel';
+import AdminPanel from '../src/AdminPanel';
 import { vi, describe, it, expect } from 'vitest';
 
 global.fetch = vi.fn(() =>
