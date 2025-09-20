@@ -121,10 +121,7 @@ export type PurchaseResponse = z.infer<typeof PurchaseResponseSchema>;
 export class ValidationError extends Error {
   details: Array<{ field: string; message: string }>;
 
-  constructor(
-    message: string,
-    details: Array<{ field: string; message: string }>
-  ) {
+  constructor(message: string, details: Array<{ field: string; message: string }>) {
     super(message);
     this.name = 'ValidationError';
     this.details = details;
