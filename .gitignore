@@ -25,3 +25,6 @@ Thumbs.db
 .env.development.local
 .env.test.local
 .env.production.local
+# Playwright test artifacts
+trace.zip
+test-results/
