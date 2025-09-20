@@ -1,34 +1,47 @@
 import { useEffect, useState } from 'react';
+import { useAuth } from './hooks';
+import api from './lib/api';
 
 interface Sweet {
   id: string;
   name: string;
   category: string;
-  price: number;
+  price: string;
   quantity: number;
+  description?: string | null;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 function AdminPanel() {
   const [sweets, setSweets] = useState<Sweet[]>([]);
-  const [form, setForm] = useState({ name: '', category: '', price: '', quantity: '' });
+  const [form, setForm] = useState({
+    name: '',
+    category: '',
+    price: '',
+    quantity: '',
+    description: '',
+  });
   const [editId, setEditId] = useState<string | null>(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [restockQuantity, setRestockQuantity] = useState<{ [key: string]: number }>({});
+  const { user } = useAuth();
 
   useEffect(() => {
-    fetchSweets();
-  }, []);
+    if (user?.role === 'admin') {
+      fetchSweets();
+    }
+  }, [user]);
 
   async function fetchSweets() {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch('/api/sweets');
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Failed to fetch sweets');
-      setSweets(data.sweets || []);
-    } catch (err: any) {
-      setError(err.message);
+      const response = await api.getSweets();
+      setSweets(response.sweets || []);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch sweets');
     } finally {
       setLoading(false);
     }
@@ -44,55 +57,52 @@ function AdminPanel() {
         category: form.category,
         price: parseFloat(form.price),
         quantity: parseInt(form.quantity, 10),
+        description: form.description || undefined,
       };
-      const url = editId ? `/api/sweets/${editId}` : '/api/sweets';
-      const method = editId ? 'PUT' : 'POST';
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Operation failed');
-      setForm({ name: '', category: '', price: '', quantity: '' });
+
+      if (editId) {
+        await api.updateSweet(editId, payload);
+      } else {
+        await api.createSweet(payload);
+      }
+
+      setForm({ name: '', category: '', price: '', quantity: '', description: '' });
       setEditId(null);
-      fetchSweets();
-    } catch (err: any) {
-      setError(err.message);
+      await fetchSweets();
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Operation failed');
     } finally {
       setLoading(false);
     }
   }
 
-  async function handleDelete(id: string) {
+  async function handleDelete(id: string, name: string) {
+    if (!confirm(`Are you sure you want to delete "${name}"?`)) {
+      return;
+    }
+
     setError('');
     setLoading(true);
     try {
-      const res = await fetch(`/api/sweets/${id}`, { method: 'DELETE' });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Delete failed');
-      fetchSweets();
-    } catch (err: any) {
-      setError(err.message);
+      await api.deleteSweet(id);
+      await fetchSweets();
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : `Failed to delete ${name}`);
     } finally {
       setLoading(false);
     }
   }
 
-  async function handleRestock(id: string) {
+  async function handleRestock(id: string, sweetName: string) {
+    const quantity = restockQuantity[id] || 10;
     setError('');
     setLoading(true);
     try {
-      const res = await fetch(`/api/sweets/${id}/restock`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ quantity: 10 }), // Example restock value
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Restock failed');
-      fetchSweets();
-    } catch (err: any) {
-      setError(err.message);
+      await api.restockSweet(id, { quantity });
+      await fetchSweets();
+      setRestockQuantity((prev) => ({ ...prev, [id]: 10 })); // Reset to default
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : `Failed to restock ${sweetName}`);
     } finally {
       setLoading(false);
     }
@@ -103,87 +113,209 @@ function AdminPanel() {
     setForm({
       name: sweet.name,
       category: sweet.category,
-      price: sweet.price.toString(),
+      price: sweet.price,
       quantity: sweet.quantity.toString(),
+      description: sweet.description || '',
     });
   }
 
+  if (!user) {
+    return (
+      <div className="max-w-md mx-auto text-center">
+        <h2 className="text-xl font-semibold mb-4 text-red-700">Access Denied</h2>
+        <p className="text-red-600">Please login to access admin features.</p>
+      </div>
+    );
+  }
+
+  if (user.role !== 'admin') {
+    return (
+      <div className="max-w-md mx-auto text-center">
+        <h2 className="text-xl font-semibold mb-4 text-red-700">Admin Access Required</h2>
+        <p className="text-red-600">You need admin privileges to access this area.</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="max-w-2xl mx-auto">
-      <h2 className="text-xl font-bold mb-4">Admin Panel</h2>
-      <form className="mb-4 border p-4 rounded" onSubmit={handleSubmit}>
-        <h3 className="font-semibold mb-2">{editId ? 'Edit Sweet' : 'Add Sweet'}</h3>
-        <input
-          type="text"
-          placeholder="Name"
-          className="input mb-2 w-full"
-          value={form.name}
-          onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-          required
+    <div className="max-w-4xl mx-auto">
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold mb-2">Admin Panel</h2>
+        <p className="text-gray-600">Manage sweets inventory and pricing</p>
+      </div>
+
+      {/* Sweet Form */}
+      <form className="mb-8 bg-white border rounded-lg p-6 shadow-sm" onSubmit={handleSubmit}>
+        <h3 className="font-semibold text-lg mb-4">{editId ? 'Edit Sweet' : 'Add New Sweet'}</h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <input
+            type="text"
+            placeholder="Sweet Name"
+            className="p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={form.name}
+            onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+            required
+          />
+          <input
+            type="text"
+            placeholder="Category"
+            className="p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={form.category}
+            onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
+            required
+          />
+          <input
+            type="number"
+            placeholder="Price ($)"
+            step="0.01"
+            min="0"
+            className="p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={form.price}
+            onChange={(e) => setForm((f) => ({ ...f, price: e.target.value }))}
+            required
+          />
+          <input
+            type="number"
+            placeholder="Initial Quantity"
+            min="0"
+            className="p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={form.quantity}
+            onChange={(e) => setForm((f) => ({ ...f, quantity: e.target.value }))}
+            required
+          />
+        </div>
+
+        <textarea
+          placeholder="Description (optional)"
+          className="w-full p-3 border rounded-lg mt-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          rows={3}
+          value={form.description}
+          onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
         />
-        <input
-          type="text"
-          placeholder="Category"
-          className="input mb-2 w-full"
-          value={form.category}
-          onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
-          required
-        />
-        <input
-          type="number"
-          placeholder="Price"
-          className="input mb-2 w-full"
-          value={form.price}
-          onChange={(e) => setForm((f) => ({ ...f, price: e.target.value }))}
-          required
-        />
-        <input
-          type="number"
-          placeholder="Quantity"
-          className="input mb-2 w-full"
-          value={form.quantity}
-          onChange={(e) => setForm((f) => ({ ...f, quantity: e.target.value }))}
-          required
-        />
-        <button type="submit" className="btn w-full" disabled={loading}>
-          {editId ? 'Update Sweet' : 'Add Sweet'}
-        </button>
-        {editId && (
+
+        <div className="flex gap-3 mt-4">
           <button
-            type="button"
-            className="btn w-full mt-2"
-            onClick={() => {
-              setEditId(null);
-              setForm({ name: '', category: '', price: '', quantity: '' });
-            }}
+            type="submit"
+            className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 disabled:opacity-50 font-medium"
+            disabled={loading}
           >
-            Cancel Edit
+            {loading ? 'Processing...' : editId ? 'Update Sweet' : 'Add Sweet'}
           </button>
-        )}
+
+          {editId && (
+            <button
+              type="button"
+              className="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 font-medium"
+              onClick={() => {
+                setEditId(null);
+                setForm({ name: '', category: '', price: '', quantity: '', description: '' });
+              }}
+            >
+              Cancel Edit
+            </button>
+          )}
+        </div>
       </form>
-      {error && <div className="text-red-500 mb-2">{error}</div>}
-      <div className="grid grid-cols-1 gap-4">
-        {sweets.map((sweet) => (
-          <div key={sweet.id} className="border rounded p-4 flex justify-between items-center">
-            <div>
-              <div className="font-semibold">{sweet.name}</div>
-              <div className="text-sm text-neutral-500">{sweet.category}</div>
-              <div className="text-sm">${sweet.price.toFixed(2)}</div>
-              <div className="text-xs">Stock: {sweet.quantity}</div>
-            </div>
-            <div className="flex gap-2">
-              <button className="btn" onClick={() => handleEdit(sweet)}>
-                Edit
-              </button>
-              <button className="btn" onClick={() => handleDelete(sweet.id)}>
-                Delete
-              </button>
-              <button className="btn" onClick={() => handleRestock(sweet.id)}>
-                Restock
-              </button>
-            </div>
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+          {error}
+        </div>
+      )}
+
+      {/* Sweets List */}
+      <div className="bg-white rounded-lg shadow-sm">
+        <div className="px-6 py-4 border-b">
+          <h3 className="font-semibold text-lg">Current Inventory</h3>
+        </div>
+
+        {loading && sweets.length === 0 ? (
+          <div className="text-center py-8">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+            <p className="mt-2">Loading inventory...</p>
           </div>
-        ))}
+        ) : (
+          <div className="divide-y">
+            {sweets.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                No sweets in inventory. Add some above!
+              </div>
+            ) : (
+              sweets.map((sweet) => (
+                <div
+                  key={sweet.id}
+                  className="p-6 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4"
+                >
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-lg">{sweet.name}</h4>
+                    <p className="text-gray-600">{sweet.category}</p>
+                    {sweet.description && (
+                      <p className="text-sm text-gray-500 mt-1">{sweet.description}</p>
+                    )}
+                    <div className="flex gap-4 mt-2">
+                      <span className="text-lg font-bold text-green-600">${sweet.price}</span>
+                      <span
+                        className={`text-sm font-medium ${
+                          sweet.quantity > 10
+                            ? 'text-green-600'
+                            : sweet.quantity > 0
+                              ? 'text-yellow-600'
+                              : 'text-red-600'
+                        }`}
+                      >
+                        Stock: {sweet.quantity}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    {/* Restock Controls */}
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="number"
+                        min="1"
+                        value={restockQuantity[sweet.id] || 10}
+                        onChange={(e) =>
+                          setRestockQuantity((prev) => ({
+                            ...prev,
+                            [sweet.id]: parseInt(e.target.value) || 1,
+                          }))
+                        }
+                        className="w-16 p-1 border rounded text-center"
+                      />
+                      <button
+                        className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 text-sm font-medium"
+                        onClick={() => handleRestock(sweet.id, sweet.name)}
+                        disabled={loading}
+                      >
+                        Restock
+                      </button>
+                    </div>
+
+                    {/* Edit/Delete Controls */}
+                    <div className="flex gap-2">
+                      <button
+                        className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm font-medium"
+                        onClick={() => handleEdit(sweet)}
+                        disabled={loading}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm font-medium"
+                        onClick={() => handleDelete(sweet.id, sweet.name)}
+                        disabled={loading}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
