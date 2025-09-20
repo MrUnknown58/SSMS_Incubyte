@@ -23,7 +23,7 @@ export default defineConfig({
             },
           },
         }
-      : undefined,
+      : { historyApiFallback: true },
   test: {
     environment: 'jsdom',
     setupFiles: ['./tests/setupTests.ts'],

@@ -236,7 +236,7 @@ function SweetsDashboard() {
           .map((sweet, index) => (
             <div
               key={sweet.id}
-              className="group bg-white border-2 border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-xl hover:border-blue-200 transition-all duration-300 transform hover:-translate-y-1 animate-in fade-in-50 slide-in-from-bottom-4"
+              className="group bg-white border-2 border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-xl hover:border-blue-200 transition-all duration-300 transform hover:-translate-y-1 animate-in fade-in-50 slide-in-from-bottom-4 flex flex-col justify-between"
               style={{ animationDelay: `${index * 100}ms` }}
             >
               <div className="mb-6">
