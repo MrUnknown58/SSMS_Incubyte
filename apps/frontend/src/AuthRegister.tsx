@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 function AuthRegister() {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -16,7 +17,7 @@ function AuthRegister() {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ name, email, password }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Registration failed');
@@ -32,6 +33,16 @@ function AuthRegister() {
     <form className="max-w-sm mx-auto p-4 border rounded" onSubmit={handleRegister}>
       <h2 className="text-lg font-bold mb-2">Register</h2>
       <input
+        type="text"
+        placeholder="Full Name"
+        className="input mb-2 w-full"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        required
+        minLength={2}
+        maxLength={50}
+      />
+      <input
         type="email"
         placeholder="Email"
         className="input mb-2 w-full"
@@ -46,6 +57,7 @@ function AuthRegister() {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         required
+        minLength={6}
       />
       <button type="submit" className="btn w-full" disabled={loading}>
         {loading ? 'Registering...' : 'Register'}
