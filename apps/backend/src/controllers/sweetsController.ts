@@ -7,7 +7,8 @@ import { db, sweets, purchases, type NewSweet, type NewPurchase } from '../db';
 // Get all sweets
 export const getAllSweets = async (req: Request, res: Response) => {
   try {
-    const allSweets = await db.select().from(sweets);
+    // Only return active sweets
+    const allSweets = await db.select().from(sweets).where(eq(sweets.isActive, true));
 
     res.status(200).json({
       success: true,
@@ -115,6 +116,8 @@ export const searchSweets = async (req: Request, res: Response) => {
       conditions.push(lte(sweets.price, String(maxPrice)));
     }
 
+    // Always filter for active sweets
+    conditions.push(eq(sweets.isActive, true));
     let searchResults;
     if (conditions.length > 0) {
       searchResults = await db
@@ -122,7 +125,7 @@ export const searchSweets = async (req: Request, res: Response) => {
         .from(sweets)
         .where(and(...conditions));
     } else {
-      searchResults = await db.select().from(sweets);
+      searchResults = await db.select().from(sweets).where(eq(sweets.isActive, true));
     }
 
     res.status(200).json({
@@ -197,9 +200,14 @@ export const deleteSweet = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    const [deletedSweet] = await db.delete(sweets).where(eq(sweets.id, id)).returning();
+    // Soft delete: set isActive to false
+    const [updatedSweet] = await db
+      .update(sweets)
+      .set({ isActive: false, updatedAt: new Date() })
+      .where(eq(sweets.id, id))
+      .returning();
 
-    if (!deletedSweet) {
+    if (!updatedSweet) {
       return res.status(404).json({
         success: false,
         message: 'Sweet not found',
@@ -243,6 +251,7 @@ export const purchaseSweet = async (req: Request, res: Response) => {
         message: 'Sweet not found',
       });
     }
+    // Allow purchase even if sweet is inactive (for audit/history)
 
     // Calculate total price
     const totalPrice = (parseFloat(sweet.price) * quantity).toFixed(2);

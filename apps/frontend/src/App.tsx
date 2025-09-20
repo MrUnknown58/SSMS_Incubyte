@@ -1,5 +1,7 @@
 import { Routes, Route, Link } from 'react-router-dom';
 import { useAuth } from './hooks';
+import { ThemeProvider } from 'next-themes';
+import { Toaster } from './components/ui/sonner';
 import AuthRegister from './AuthRegister';
 import AuthLogin from './AuthLogin';
 import SweetsDashboard from './SweetsDashboard';
@@ -300,15 +302,18 @@ function Admin() {
 
 function App() {
   return (
-    <Layout>
-      <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/auth" element={<Auth />} />
-        <Route path="/auth/register" element={<AuthRegister />} />
-        <Route path="/auth/login" element={<AuthLogin />} />
-        <Route path="/admin" element={<Admin />} />
-      </Routes>
-    </Layout>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/auth/register" element={<AuthRegister />} />
+          <Route path="/auth/login" element={<AuthLogin />} />
+          <Route path="/admin" element={<Admin />} />
+        </Routes>
+      </Layout>
+      <Toaster />
+    </ThemeProvider>
   );
 }
 

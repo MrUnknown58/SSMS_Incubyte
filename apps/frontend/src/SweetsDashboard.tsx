@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from './hooks';
+import { toast } from 'sonner';
 import api from './lib/api';
 
 interface Sweet {
@@ -9,6 +10,7 @@ interface Sweet {
   price: string;
   quantity: number;
   description?: string | null;
+  isActive?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -18,6 +20,7 @@ function SweetsDashboard() {
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [purchasingIds, setPurchasingIds] = useState<Set<string>>(new Set());
   const { user } = useAuth();
 
   useEffect(() => {
@@ -44,15 +47,68 @@ function SweetsDashboard() {
   }, [search, user]);
 
   async function handlePurchase(id: string, sweetName: string) {
+    // Prevent race conditions - don't allow multiple purchases of the same item
+    if (purchasingIds.has(id)) {
+      toast.warning('Purchase already in progress', {
+        description: `Please wait for the current purchase of ${sweetName} to complete.`,
+      });
+      return;
+    }
+
     setError('');
+
+    // Find the sweet to get current quantity for rollback
+    const sweet = sweets.find((s) => s.id === id);
+    if (!sweet) {
+      toast.error('Purchase failed', {
+        description: 'Sweet not found in inventory.',
+      });
+      return;
+    }
+
+    const originalQuantity = sweet.quantity;
+
+    // Prevent purchasing if out of stock
+    if (originalQuantity <= 0) {
+      toast.error('Out of stock', {
+        description: `${sweetName} is currently out of stock.`,
+      });
+      return;
+    }
+
+    // Add to purchasing set to prevent race conditions
+    setPurchasingIds((prev) => new Set(prev).add(id));
+
+    // Optimistic update - reduce quantity immediately
+    setSweets((sweets) =>
+      sweets.map((s) => (s.id === id ? { ...s, quantity: s.quantity - 1 } : s))
+    );
+
     try {
       await api.purchaseSweet(id, { quantity: 1 });
-      // Refresh sweets list
-      setSweets((sweets) =>
-        sweets.map((s) => (s.id === id ? { ...s, quantity: s.quantity - 1 } : s))
-      );
+
+      toast.success('Purchase successful!', {
+        description: `You successfully purchased 1 ${sweetName}.`,
+      });
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : `Failed to purchase ${sweetName}`);
+      // Rollback optimistic update on failure
+      setSweets((sweets) =>
+        sweets.map((s) => (s.id === id ? { ...s, quantity: originalQuantity } : s))
+      );
+
+      const errorMessage = err instanceof Error ? err.message : `Failed to purchase ${sweetName}`;
+      setError(errorMessage);
+
+      toast.error('Purchase failed', {
+        description: errorMessage,
+      });
+    } finally {
+      // Remove from purchasing set
+      setPurchasingIds((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(id);
+        return newSet;
+      });
     }
   }
 
@@ -146,7 +202,7 @@ function SweetsDashboard() {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {sweets.length === 0 && !loading ? (
+        {sweets.filter((s) => s.isActive !== false).length === 0 && !loading ? (
           <div className="col-span-full text-center py-16">
             <div className="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
               <svg
@@ -172,91 +228,110 @@ function SweetsDashboard() {
           </div>
         ) : null}
 
-        {sweets.map((sweet, index) => (
-          <div
-            key={sweet.id}
-            className="group bg-white border-2 border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-xl hover:border-blue-200 transition-all duration-300 transform hover:-translate-y-1 animate-in fade-in-50 slide-in-from-bottom-4"
-            style={{ animationDelay: `${index * 100}ms` }}
-          >
-            <div className="mb-6">
-              <div className="flex items-start justify-between mb-3">
-                <h3 className="font-bold text-xl text-gray-800 group-hover:text-blue-600 transition-colors">
-                  {sweet.name}
-                </h3>
-                <div
-                  className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    sweet.quantity > 10
-                      ? 'bg-green-100 text-green-700'
-                      : sweet.quantity > 0
-                        ? 'bg-yellow-100 text-yellow-700'
-                        : 'bg-red-100 text-red-700'
-                  }`}
-                >
-                  {sweet.quantity > 0 ? `${sweet.quantity} left` : 'Out of stock'}
-                </div>
-              </div>
-              <div className="inline-block px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-full mb-3">
-                {sweet.category}
-              </div>
-              {sweet.description && (
-                <p className="text-gray-600 mb-4 leading-relaxed">{sweet.description}</p>
-              )}
-              <div className="flex items-center justify-between">
-                <span className="text-2xl font-bold text-green-600">${sweet.price}</span>
-                <div className="flex items-center space-x-2">
-                  <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path
-                      fillRule="evenodd"
-                      d="M10 2L3 7v11a2 2 0 002 2h10a2 2 0 002-2V7l-7-5zM10 12a2 2 0 100-4 2 2 0 000 4z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  <span className="text-sm text-gray-500">In stock</span>
-                </div>
-              </div>
-            </div>
-
-            <button
-              className={`w-full py-3 px-6 rounded-xl font-semibold transition-all duration-200 transform ${
-                sweet.quantity === 0
-                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700 hover:scale-105 shadow-lg hover:shadow-xl'
-              }`}
-              disabled={sweet.quantity === 0}
-              onClick={() => handlePurchase(sweet.id, sweet.name)}
+        {sweets
+          .filter((s) => s.isActive !== false)
+          .map((sweet, index) => (
+            <div
+              key={sweet.id}
+              className="group bg-white border-2 border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-xl hover:border-blue-200 transition-all duration-300 transform hover:-translate-y-1 animate-in fade-in-50 slide-in-from-bottom-4"
+              style={{ animationDelay: `${index * 100}ms` }}
             >
-              {sweet.quantity === 0 ? (
-                <span className="flex items-center justify-center">
-                  <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                    <path
-                      fillRule="evenodd"
-                      d="M13.477 14.89A6 6 0 015.11 6.524l8.367 8.368zm1.414-1.414L6.524 5.11a6 6 0 018.367 8.367zM18 10a8 8 0 11-16 0 8 8 0 0116 0z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  Out of Stock
-                </span>
-              ) : (
-                <span className="flex items-center justify-center">
-                  <svg
-                    className="w-5 h-5 mr-2"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+              <div className="mb-6">
+                <div className="flex items-start justify-between mb-3">
+                  <h3 className="font-bold text-xl text-gray-800 group-hover:text-blue-600 transition-colors">
+                    {sweet.name}
+                  </h3>
+                  <div
+                    className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      sweet.quantity > 10
+                        ? 'bg-green-100 text-green-700'
+                        : sweet.quantity > 0
+                          ? 'bg-yellow-100 text-yellow-700'
+                          : 'bg-red-100 text-red-700'
+                    }`}
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5-5M7 13l-2.5 5M17 21a2 2 0 100-4 2 2 0 000 4zm-8 0a2 2 0 100-4 2 2 0 000 4z"
-                    />
-                  </svg>
-                  Purchase (1 item)
-                </span>
-              )}
-            </button>
-          </div>
-        ))}
+                    {sweet.quantity > 0 ? `${sweet.quantity} left` : 'Out of stock'}
+                  </div>
+                </div>
+                <div className="inline-block px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-full mb-3">
+                  {sweet.category}
+                </div>
+                {sweet.description && (
+                  <p className="text-gray-600 mb-4 leading-relaxed">{sweet.description}</p>
+                )}
+                <div className="flex items-center justify-between">
+                  <span className="text-2xl font-bold text-green-600">${sweet.price}</span>
+                  <div className="flex items-center space-x-2">
+                    <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path
+                        fillRule="evenodd"
+                        d="M10 2L3 7v11a2 2 0 002 2h10a2 2 0 002-2V7l-7-5zM10 12a2 2 0 100-4 2 2 0 000 4z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    <span className="text-sm text-gray-500">In stock</span>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                className={`w-full py-3 px-6 rounded-xl font-semibold transition-all duration-200 transform ${
+                  sweet.quantity === 0 || purchasingIds.has(sweet.id)
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700 hover:scale-105 shadow-lg hover:shadow-xl'
+                }`}
+                disabled={sweet.quantity === 0 || purchasingIds.has(sweet.id)}
+                onClick={() => handlePurchase(sweet.id, sweet.name)}
+              >
+                {purchasingIds.has(sweet.id) ? (
+                  <span className="flex items-center justify-center">
+                    <svg
+                      className="w-5 h-5 mr-2 animate-spin"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                      />
+                    </svg>
+                    Processing...
+                  </span>
+                ) : sweet.quantity === 0 ? (
+                  <span className="flex items-center justify-center">
+                    <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                      <path
+                        fillRule="evenodd"
+                        d="M13.477 14.89A6 6 0 015.11 6.524l8.367 8.368zm1.414-1.414L6.524 5.11a6 6 0 018.367 8.367zM18 10a8 8 0 11-16 0 8 8 0 0116 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    Out of Stock
+                  </span>
+                ) : (
+                  <span className="flex items-center justify-center">
+                    <svg
+                      className="w-5 h-5 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5-5M7 13l-2.5 5M17 21a2 2 0 100-4 2 2 0 000 4zm-8 0a2 2 0 100-4 2 2 0 000 4z"
+                      />
+                    </svg>
+                    Purchase (1 item)
+                  </span>
+                )}
+              </button>
+            </div>
+          ))}
       </div>
     </div>
   );

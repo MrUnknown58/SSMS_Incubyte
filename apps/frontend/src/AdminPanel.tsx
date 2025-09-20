@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from './hooks';
+import { toast } from 'sonner';
 import api from './lib/api';
 
 interface Sweet {
@@ -9,6 +10,7 @@ interface Sweet {
   price: string;
   quantity: number;
   description?: string | null;
+  isActive?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -62,15 +64,25 @@ function AdminPanel() {
 
       if (editId) {
         await api.updateSweet(editId, payload);
+        toast.success('Sweet updated successfully!', {
+          description: `${form.name} has been updated in your inventory.`,
+        });
       } else {
         await api.createSweet(payload);
+        toast.success('Sweet added successfully!', {
+          description: `${form.name} has been added to your inventory.`,
+        });
       }
 
       setForm({ name: '', category: '', price: '', quantity: '', description: '' });
       setEditId(null);
       await fetchSweets();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Operation failed');
+      const errorMessage = err instanceof Error ? err.message : 'Operation failed';
+      setError(errorMessage);
+      toast.error('Operation failed', {
+        description: errorMessage,
+      });
     } finally {
       setLoading(false);
     }
@@ -85,9 +97,16 @@ function AdminPanel() {
     setLoading(true);
     try {
       await api.deleteSweet(id);
+      toast.success('Sweet deleted successfully!', {
+        description: `${name} has been removed from your inventory.`,
+      });
       await fetchSweets();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : `Failed to delete ${name}`);
+      const errorMessage = err instanceof Error ? err.message : `Failed to delete ${name}`;
+      setError(errorMessage);
+      toast.error('Delete failed', {
+        description: errorMessage,
+      });
     } finally {
       setLoading(false);
     }
@@ -99,10 +118,17 @@ function AdminPanel() {
     setLoading(true);
     try {
       await api.restockSweet(id, { quantity });
+      toast.success('Restock completed!', {
+        description: `Added ${quantity} units to ${sweetName}.`,
+      });
       await fetchSweets();
       setRestockQuantity((prev) => ({ ...prev, [id]: 10 })); // Reset to default
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : `Failed to restock ${sweetName}`);
+      const errorMessage = err instanceof Error ? err.message : `Failed to restock ${sweetName}`;
+      setError(errorMessage);
+      toast.error('Restock failed', {
+        description: errorMessage,
+      });
     } finally {
       setLoading(false);
     }

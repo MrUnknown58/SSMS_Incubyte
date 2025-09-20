@@ -20,6 +20,7 @@ export const sweets = pgTable('sweets', {
   price: decimal('price', { precision: 10, scale: 2 }).notNull(),
   quantity: integer('quantity').notNull().default(0),
   description: text('description'),
+  isActive: boolean('is_active').notNull().default(true),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 });
