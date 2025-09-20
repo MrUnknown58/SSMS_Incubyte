@@ -1,61 +1,65 @@
 import { Request, Response, NextFunction } from 'express';
-import { verify } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-key';
+const JWT_SECRET = process.env.JWT_SECRET || 'test-secret';
 
 // Extend Request interface to include user data
-export interface AuthenticatedRequest extends Request {
-  user?: {
-    userId: string;
-    email: string;
-    isAdmin: boolean;
-  };
+declare global {
+  namespace Express {
+    interface Request {
+      user?: {
+        id: string;
+        email: string;
+        role: string;
+      };
+    }
+  }
 }
 
 // JWT authentication middleware
-export const authenticateToken = (
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction
-): void => {
+export const authenticateToken = (req: Request, res: Response, next: NextFunction): void => {
   const authHeader = req.headers.authorization;
   const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
 
   if (!token) {
     res.status(401).json({
-      success: false,
-      message: 'Access denied. No token provided.',
+      error: 'Unauthorized',
+      message: 'No token provided',
     });
     return;
   }
 
   try {
-    const decoded = verify(token, JWT_SECRET) as {
-      userId: string;
+    const decoded = jwt.verify(token, JWT_SECRET) as {
+      id: string;
       email: string;
-      isAdmin: boolean;
+      role: string;
     };
 
     req.user = decoded;
     next();
   } catch (error) {
-    res.status(403).json({
-      success: false,
-      message: 'Invalid token.',
+    if (error instanceof jwt.TokenExpiredError) {
+      res.status(401).json({
+        error: 'Unauthorized',
+        message: 'Token expired',
+      });
+      return;
+    }
+
+    res.status(401).json({
+      error: 'Unauthorized',
+      message: 'Invalid token',
     });
   }
 };
 
 // Admin authorization middleware (requires authenticateToken first)
-export const requireAdmin = (
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction
-): void => {
-  if (!req.user?.isAdmin) {
+export const requireAdmin = (req: Request, res: Response, next: NextFunction): void => {
+  if (!req.user || req.user.role !== 'admin') {
     res.status(403).json({
-      success: false,
-      message: 'Access denied. Admin privileges required.',
+      error: 'Forbidden',
+      message: 'Admin access required',
     });
     return;
   }
