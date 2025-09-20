@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { validationResult } from 'express-validator';
-import { eq, like, ilike, and, gte, lte } from 'drizzle-orm';
+import { eq, ilike, and, gte, lte, sql } from 'drizzle-orm';
 
 import { db, sweets, purchases, type NewSweet, type NewPurchase } from '../db';
 
@@ -234,7 +234,7 @@ export const purchaseSweet = async (req: Request, res: Response) => {
     const { quantity } = req.body;
     const userId = req.user!.id;
 
-    // Get sweet details
+    // Get sweet details for price calculation
     const [sweet] = await db.select().from(sweets).where(eq(sweets.id, id)).limit(1);
 
     if (!sweet) {
@@ -244,17 +244,28 @@ export const purchaseSweet = async (req: Request, res: Response) => {
       });
     }
 
-    if (sweet.quantity < quantity) {
+    // Calculate total price
+    const totalPrice = (parseFloat(sweet.price) * quantity).toFixed(2);
+
+    // Atomic stock update with concurrency protection
+    // UPDATE sweets SET quantity = quantity - $1 WHERE id=$2 AND quantity >= $1 RETURNING *
+    const [updatedSweet] = await db
+      .update(sweets)
+      .set({
+        quantity: sql`${sweets.quantity} - ${quantity}`,
+        updatedAt: new Date(),
+      })
+      .where(and(eq(sweets.id, id), gte(sweets.quantity, quantity)))
+      .returning();
+
+    if (!updatedSweet) {
       return res.status(400).json({
         success: false,
         message: 'Insufficient stock',
       });
     }
 
-    // Calculate total price
-    const totalPrice = (parseFloat(sweet.price) * quantity).toFixed(2);
-
-    // Create purchase record
+    // Create purchase audit record
     const newPurchase: NewPurchase = {
       userId,
       sweetId: id,
@@ -263,15 +274,6 @@ export const purchaseSweet = async (req: Request, res: Response) => {
     };
 
     const [purchase] = await db.insert(purchases).values(newPurchase).returning();
-
-    // Update sweet quantity
-    await db
-      .update(sweets)
-      .set({
-        quantity: sweet.quantity - quantity,
-        updatedAt: new Date(),
-      })
-      .where(eq(sweets.id, id));
 
     res.status(200).json({
       success: true,
