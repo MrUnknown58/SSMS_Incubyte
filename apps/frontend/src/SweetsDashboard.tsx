@@ -58,75 +58,202 @@ function SweetsDashboard() {
 
   if (!user) {
     return (
-      <div className="max-w-md mx-auto text-center">
-        <h2 className="text-xl font-semibold mb-4">Please Login</h2>
-        <p className="text-gray-600">You need to be logged in to view the sweets dashboard.</p>
+      <div className="max-w-md mx-auto text-center animate-in fade-in-50 duration-500">
+        <div className="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl p-8 shadow-lg border border-blue-200">
+          <div className="w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
+            <svg
+              className="w-8 h-8 text-blue-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+              />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold mb-4 text-gray-800">Please Login</h2>
+          <p className="text-gray-600 leading-relaxed">
+            You need to be logged in to view the sweets dashboard.
+          </p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold mb-2">Sweets Dashboard</h2>
-        <p className="text-gray-600">Browse and purchase delicious sweets</p>
+    <div className="max-w-6xl mx-auto animate-in fade-in-50 duration-700">
+      <div className="mb-8 text-center">
+        <h1 className="text-4xl font-bold mb-3 bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
+          Sweets Dashboard
+        </h1>
+        <p className="text-xl text-gray-600 leading-relaxed">
+          Discover and purchase our delicious collection of sweets
+        </p>
       </div>
 
-      <input
-        type="text"
-        placeholder="Search sweets by name..."
-        className="w-full p-3 border rounded-lg mb-6 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-      />
+      <div className="relative mb-8 max-w-md mx-auto">
+        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <svg
+            className="h-5 w-5 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
+        </div>
+        <input
+          type="text"
+          placeholder="Search sweets by name..."
+          className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 text-gray-700 placeholder-gray-400"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+      </div>
 
       {loading && (
-        <div className="text-center py-8">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-          <p className="mt-2">Loading sweets...</p>
+        <div className="text-center py-12">
+          <div className="relative">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-200 border-t-blue-600"></div>
+            <div className="absolute inset-0 animate-ping rounded-full h-12 w-12 border-4 border-blue-300 opacity-30"></div>
+          </div>
+          <p className="mt-4 text-lg text-gray-600 animate-pulse">Loading delicious sweets...</p>
         </div>
       )}
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
-          {error}
+        <div className="bg-red-50 border-l-4 border-red-400 text-red-700 px-6 py-4 rounded-r-lg mb-6 animate-in slide-in-from-left-5 duration-300">
+          <div className="flex items-center">
+            <svg className="w-5 h-5 mr-2 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fillRule="evenodd"
+                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                clipRule="evenodd"
+              />
+            </svg>
+            <span className="font-medium">{error}</span>
+          </div>
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {sweets.length === 0 && !loading ? (
-          <div className="col-span-full text-center py-8 text-gray-500">
-            No sweets found. {search ? 'Try a different search term.' : ''}
+          <div className="col-span-full text-center py-16">
+            <div className="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
+              <svg
+                className="w-12 h-12 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold text-gray-700 mb-2">No sweets found</h3>
+            <p className="text-gray-500">
+              {search
+                ? 'Try a different search term or browse all sweets.'
+                : 'Check back later for new arrivals!'}
+            </p>
           </div>
         ) : null}
 
-        {sweets.map((sweet) => (
+        {sweets.map((sweet, index) => (
           <div
             key={sweet.id}
-            className="border rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow"
+            className="group bg-white border-2 border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-xl hover:border-blue-200 transition-all duration-300 transform hover:-translate-y-1 animate-in fade-in-50 slide-in-from-bottom-4"
+            style={{ animationDelay: `${index * 100}ms` }}
           >
-            <div className="mb-4">
-              <h3 className="font-semibold text-lg mb-1">{sweet.name}</h3>
-              <p className="text-sm text-gray-500 mb-2">{sweet.category}</p>
+            <div className="mb-6">
+              <div className="flex items-start justify-between mb-3">
+                <h3 className="font-bold text-xl text-gray-800 group-hover:text-blue-600 transition-colors">
+                  {sweet.name}
+                </h3>
+                <div
+                  className={`px-3 py-1 rounded-full text-xs font-medium ${
+                    sweet.quantity > 10
+                      ? 'bg-green-100 text-green-700'
+                      : sweet.quantity > 0
+                        ? 'bg-yellow-100 text-yellow-700'
+                        : 'bg-red-100 text-red-700'
+                  }`}
+                >
+                  {sweet.quantity > 0 ? `${sweet.quantity} left` : 'Out of stock'}
+                </div>
+              </div>
+              <div className="inline-block px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-full mb-3">
+                {sweet.category}
+              </div>
               {sweet.description && (
-                <p className="text-sm text-gray-600 mb-2">{sweet.description}</p>
+                <p className="text-gray-600 mb-4 leading-relaxed">{sweet.description}</p>
               )}
-              <div className="flex justify-between items-center">
-                <span className="text-lg font-bold text-green-600">${sweet.price}</span>
-                <span className="text-sm text-gray-500">Stock: {sweet.quantity}</span>
+              <div className="flex items-center justify-between">
+                <span className="text-2xl font-bold text-green-600">${sweet.price}</span>
+                <div className="flex items-center space-x-2">
+                  <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                      fillRule="evenodd"
+                      d="M10 2L3 7v11a2 2 0 002 2h10a2 2 0 002-2V7l-7-5zM10 12a2 2 0 100-4 2 2 0 000 4z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  <span className="text-sm text-gray-500">In stock</span>
+                </div>
               </div>
             </div>
 
             <button
-              className={`w-full py-2 px-4 rounded font-medium transition-colors ${
+              className={`w-full py-3 px-6 rounded-xl font-semibold transition-all duration-200 transform ${
                 sweet.quantity === 0
-                  ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                  : 'bg-blue-500 text-white hover:bg-blue-600'
+                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700 hover:scale-105 shadow-lg hover:shadow-xl'
               }`}
               disabled={sweet.quantity === 0}
               onClick={() => handlePurchase(sweet.id, sweet.name)}
             >
-              {sweet.quantity === 0 ? 'Out of Stock' : 'Purchase (1 item)'}
+              {sweet.quantity === 0 ? (
+                <span className="flex items-center justify-center">
+                  <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                      fillRule="evenodd"
+                      d="M13.477 14.89A6 6 0 015.11 6.524l8.367 8.368zm1.414-1.414L6.524 5.11a6 6 0 018.367 8.367zM18 10a8 8 0 11-16 0 8 8 0 0116 0z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  Out of Stock
+                </span>
+              ) : (
+                <span className="flex items-center justify-center">
+                  <svg
+                    className="w-5 h-5 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5-5M7 13l-2.5 5M17 21a2 2 0 100-4 2 2 0 000 4zm-8 0a2 2 0 100-4 2 2 0 000 4z"
+                    />
+                  </svg>
+                  Purchase (1 item)
+                </span>
+              )}
             </button>
           </div>
         ))}

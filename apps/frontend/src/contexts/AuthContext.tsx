@@ -6,10 +6,11 @@ import api from '../lib/api';
 
 interface User {
   id: string;
-
   email: string;
-
-  role: 'user' | 'admin';
+  name: string;
+  isAdmin: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 interface AuthContextType {
@@ -21,7 +22,7 @@ interface AuthContextType {
 
   login: (email: string, password: string) => Promise<void>;
 
-  register: (email: string, password: string, role?: 'user' | 'admin') => Promise<void>;
+  register: (email: string, password: string, name: string, isAdmin?: boolean) => Promise<void>;
 
   logout: () => void;
 }
@@ -73,12 +74,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const register = async (
     email: string,
-
     password: string,
-
-    role: 'user' | 'admin' = 'user'
+    name: string,
+    isAdmin: boolean = false
   ): Promise<void> => {
-    const response: AuthResponse = await api.register({ email, password, role });
+    const response: AuthResponse = await api.register({ email, password, name, isAdmin });
 
     setUser(response.user);
 
@@ -115,4 +115,3 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 export { AuthContext };
 
 export type { AuthContextType, User };
-

@@ -273,7 +273,15 @@ export const purchaseSweet = async (req: Request, res: Response) => {
       totalPrice,
     };
 
-    const [purchase] = await db.insert(purchases).values(newPurchase).returning();
+    const [purchase] = await db
+      .insert(purchases)
+      .values({
+        userId: userId,
+        sweetId: id,
+        quantity: quantity,
+        totalPrice: totalPrice,
+      })
+      .returning();
 
     res.status(200).json({
       success: true,

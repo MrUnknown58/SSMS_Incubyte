@@ -30,7 +30,7 @@ export const errorHandler = (
     statusCode = 400;
     errorType = 'Validation Error';
     message = 'Request validation failed';
-    details = error.errors.map((err) => ({
+    details = error.issues.map((err) => ({
       field: err.path.join('.'),
       message: err.message,
     }));

@@ -9,8 +9,8 @@ import { db, users, type NewUser } from '../db';
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-key';
 
 // Generate JWT token
-const generateToken = (userId: string, email: string, isAdmin: boolean) => {
-  return sign({ userId, email, isAdmin }, JWT_SECRET, { expiresIn: '24h' });
+const generateToken = (id: string, email: string, name: string, isAdmin: boolean) => {
+  return sign({ id, email, name, isAdmin }, JWT_SECRET, { expiresIn: '24h' });
 };
 
 // Register new user
@@ -55,10 +55,16 @@ export const register = async (req: Request, res: Response) => {
       name: users.name,
       isAdmin: users.isAdmin,
       createdAt: users.createdAt,
+      updatedAt: users.updatedAt,
     });
 
     // Generate JWT token
-    const token = generateToken(createdUser.id, createdUser.email, createdUser.isAdmin);
+    const token = generateToken(
+      createdUser.id,
+      createdUser.email,
+      createdUser.name,
+      createdUser.isAdmin
+    );
 
     res.status(201).json({
       success: true,
@@ -108,7 +114,7 @@ export const login = async (req: Request, res: Response) => {
     }
 
     // Generate JWT token
-    const token = generateToken(user.id, user.email, user.isAdmin);
+    const token = generateToken(user.id, user.email, user.name, user.isAdmin);
 
     // Return user data (without password)
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

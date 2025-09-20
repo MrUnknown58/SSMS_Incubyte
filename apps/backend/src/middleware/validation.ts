@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { ZodSchema, ZodError } from 'zod';
+import { ZodType, ZodError } from 'zod';
 import {
   RegisterUserSchema,
   LoginUserSchema,
@@ -11,7 +11,7 @@ import {
 } from '@sweet-shop/types';
 
 // Generic Zod validation middleware
-export const validateSchema = (schema: ZodSchema) => {
+export const validateSchema = (schema: ZodType) => {
   return (req: Request, res: Response, next: NextFunction) => {
     try {
       // Validate the request body
@@ -29,11 +29,12 @@ export const validateSchema = (schema: ZodSchema) => {
 };
 
 // Query parameter validation middleware
-export const validateQuery = (schema: ZodSchema) => {
+export const validateQuery = (schema: ZodType) => {
   return (req: Request, res: Response, next: NextFunction) => {
     try {
       // Validate the query parameters
-      req.query = schema.parse(req.query);
+      const validatedQuery = schema.parse(req.query);
+      req.query = validatedQuery as any;
       next();
     } catch (error) {
       if (error instanceof ZodError) {

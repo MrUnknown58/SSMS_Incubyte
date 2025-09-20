@@ -4,7 +4,8 @@ import { z } from 'zod';
 export const RegisterUserSchema = z.object({
   email: z.string().email('Invalid email format'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
-  role: z.enum(['user', 'admin']).optional().default('user'),
+  name: z.string().min(1, 'Name is required'),
+  isAdmin: z.boolean().optional().default(false),
 });
 
 export const LoginUserSchema = z.object({
@@ -35,8 +36,14 @@ export const RestockSchema = z.object({
 export const SearchSweetsSchema = z.object({
   name: z.string().optional(),
   category: z.string().optional(),
-  minPrice: z.string().regex(/^\d+(\.\d+)?$/, 'Invalid price format').optional(),
-  maxPrice: z.string().regex(/^\d+(\.\d+)?$/, 'Invalid price format').optional(),
+  minPrice: z
+    .string()
+    .regex(/^\d+(\.\d+)?$/, 'Invalid price format')
+    .optional(),
+  maxPrice: z
+    .string()
+    .regex(/^\d+(\.\d+)?$/, 'Invalid price format')
+    .optional(),
 });
 
 // Error response schema
@@ -46,10 +53,14 @@ export const ErrorResponseSchema = z.object({
   message: z.string(),
   timestamp: z.string(),
   path: z.string(),
-  details: z.array(z.object({
-    field: z.string(),
-    message: z.string(),
-  })).optional(),
+  details: z
+    .array(
+      z.object({
+        field: z.string(),
+        message: z.string(),
+      })
+    )
+    .optional(),
 });
 
 // Success response schemas
@@ -58,7 +69,10 @@ export const AuthResponseSchema = z.object({
   user: z.object({
     id: z.string(),
     email: z.string(),
-    role: z.enum(['user', 'admin']),
+    name: z.string(),
+    isAdmin: z.boolean(),
+    createdAt: z.string(),
+    updatedAt: z.string(),
   }),
   token: z.string(),
 });

@@ -10,7 +10,8 @@ declare global {
       user?: {
         id: string;
         email: string;
-        role: string;
+        name: string;
+        isAdmin: boolean;
       };
     }
   }
@@ -33,7 +34,8 @@ export const authenticateToken = (req: Request, res: Response, next: NextFunctio
     const decoded = jwt.verify(token, JWT_SECRET) as {
       id: string;
       email: string;
-      role: string;
+      name: string;
+      isAdmin: boolean;
     };
 
     req.user = decoded;
@@ -56,7 +58,7 @@ export const authenticateToken = (req: Request, res: Response, next: NextFunctio
 
 // Admin authorization middleware (requires authenticateToken first)
 export const requireAdmin = (req: Request, res: Response, next: NextFunction): void => {
-  if (!req.user || req.user.role !== 'admin') {
+  if (!req.user || !req.user.isAdmin) {
     res.status(403).json({
       error: 'Forbidden',
       message: 'Admin access required',
