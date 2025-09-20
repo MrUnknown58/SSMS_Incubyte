@@ -1,5 +1,9 @@
 import { useState } from 'react';
 import { useAuth } from './hooks';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 
 function AuthRegister() {
   const [email, setEmail] = useState('');
@@ -56,33 +60,34 @@ function AuthRegister() {
 
   return (
     <div className="max-w-md mx-auto animate-in fade-in-50 slide-in-from-bottom-4 duration-500">
-      <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
-        <div className="bg-gradient-to-r from-green-600 to-teal-600 px-8 py-6">
-          <h2 className="text-3xl font-bold text-white text-center">Join Us</h2>
-          <p className="text-green-100 text-center mt-2">Create your sweet shop account</p>
-        </div>
-
-        <form className="p-8" onSubmit={handleRegister}>
-          {error && (
-            <div className="bg-red-50 border-l-4 border-red-400 text-red-700 px-4 py-3 rounded-r-lg mb-6 animate-in slide-in-from-left-5 duration-300">
-              <div className="flex items-center">
-                <svg className="w-5 h-5 mr-2 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path
-                    fillRule="evenodd"
-                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                <span className="font-medium">{error}</span>
+      <Card className="overflow-hidden">
+        <CardHeader className="bg-gradient-to-r from-green-600 to-teal-600 text-center">
+          <h2 className="text-3xl font-bold text-white">Join Us</h2>
+          <p className="text-green-100 mt-2">Create your sweet shop account</p>
+        </CardHeader>
+        <CardContent>
+          <form className="space-y-6" onSubmit={handleRegister}>
+            {error && (
+              <div className="bg-red-50 border-l-4 border-red-400 text-red-700 px-4 py-3 rounded-r-lg animate-in slide-in-from-left-5 duration-300">
+                <div className="flex items-center">
+                  <svg
+                    className="w-5 h-5 mr-2 text-red-500"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  <span className="font-medium">{error}</span>
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          <div className="space-y-6">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Email Address
-              </label>
+              <Label>Email Address</Label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg
@@ -99,10 +104,10 @@ function AuthRegister() {
                     />
                   </svg>
                 </div>
-                <input
+                <Input
                   type="email"
                   placeholder="Enter your email"
-                  className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all duration-200"
+                  className="pl-10"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -111,7 +116,7 @@ function AuthRegister() {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Full Name</label>
+              <Label>Full Name</Label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg
@@ -128,10 +133,10 @@ function AuthRegister() {
                     />
                   </svg>
                 </div>
-                <input
+                <Input
                   type="text"
                   placeholder="Enter your full name"
-                  className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all duration-200"
+                  className="pl-10"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
@@ -140,7 +145,7 @@ function AuthRegister() {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
+              <Label>Password</Label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg
@@ -157,10 +162,10 @@ function AuthRegister() {
                     />
                   </svg>
                 </div>
-                <input
+                <Input
                   type="password"
                   placeholder="Minimum 8 characters"
-                  className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all duration-200"
+                  className="pl-10"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -170,82 +175,72 @@ function AuthRegister() {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Account Type</label>
+              <Label>Account Type</Label>
               <div className="grid grid-cols-2 gap-3">
-                <button
+                <Button
                   type="button"
-                  className={`p-3 rounded-xl border-2 transition-all duration-200 ${
-                    !isAdmin
-                      ? 'border-green-500 bg-green-50 text-green-700'
-                      : 'border-gray-200 hover:border-gray-300 text-gray-600'
-                  }`}
+                  variant={!isAdmin ? 'secondary' : 'ghost'}
+                  className={!isAdmin ? 'border-2 border-green-500 bg-green-50 text-green-700' : ''}
                   onClick={() => setIsAdmin(false)}
                 >
-                  <div className="text-center">
+                  <div className="text-center w-full">
                     <div className="text-2xl mb-1">👤</div>
                     <div className="font-medium">User</div>
                     <div className="text-xs opacity-75">Browse & Purchase</div>
                   </div>
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
-                  className={`p-3 rounded-xl border-2 transition-all duration-200 ${
-                    isAdmin
-                      ? 'border-green-500 bg-green-50 text-green-700'
-                      : 'border-gray-200 hover:border-gray-300 text-gray-600'
-                  }`}
+                  variant={isAdmin ? 'secondary' : 'ghost'}
+                  className={isAdmin ? 'border-2 border-green-500 bg-green-50 text-green-700' : ''}
                   onClick={() => setIsAdmin(true)}
                 >
-                  <div className="text-center">
+                  <div className="text-center w-full">
                     <div className="text-2xl mb-1">👑</div>
                     <div className="font-medium">Admin</div>
                     <div className="text-xs opacity-75">Manage Inventory</div>
                   </div>
-                </button>
+                </Button>
               </div>
             </div>
-          </div>
 
-          <button
-            type="submit"
-            className="w-full mt-8 py-3 px-6 bg-gradient-to-r from-green-500 to-teal-600 text-white font-semibold rounded-xl hover:from-green-600 hover:to-teal-700 focus:outline-none focus:ring-4 focus:ring-green-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl"
-            disabled={loading}
-          >
-            {loading ? (
-              <span className="flex items-center justify-center">
-                <svg
-                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
-                Creating Account...
-              </span>
-            ) : (
-              'Create Account'
-            )}
-          </button>
+            <Button type="submit" className="w-full mt-2" disabled={loading}>
+              {loading ? (
+                <span className="flex items-center justify-center">
+                  <svg
+                    className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  Creating Account...
+                </span>
+              ) : (
+                'Create Account'
+              )}
+            </Button>
 
-          <div className="mt-6 p-4 bg-gray-50 rounded-xl border border-gray-200">
-            <p className="text-sm text-gray-600 text-center">
-              🔒 Your information is secure and encrypted
-            </p>
-          </div>
-        </form>
-      </div>
+            <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
+              <p className="text-sm text-gray-600 text-center">
+                🔒 Your information is secure and encrypted
+              </p>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 }

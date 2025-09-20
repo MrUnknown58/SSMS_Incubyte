@@ -19,7 +19,7 @@ if (!databaseUrl) {
 const sql = neon(databaseUrl);
 
 // Create Drizzle instance with schema
-export const db = drizzle({ client: sql, schema });
+export const db = drizzle(sql, { schema });
 
 // Export schema for convenience
 export * from './schema';

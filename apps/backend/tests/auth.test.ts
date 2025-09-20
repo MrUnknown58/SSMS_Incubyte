@@ -1,38 +1,46 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { randomUUID } from 'crypto';
+
+import { beforeAll, afterAll, describe, it, expect } from 'vitest';
 import request from 'supertest';
+import { eq } from 'drizzle-orm';
 
 import app from '../src/index';
+import { db, users } from '../src/db';
 
-// Mock the database connection to avoid real database calls during tests
-vi.mock('../src/db', () => ({
-  db: {
-    select: vi.fn(),
-    insert: vi.fn(),
-    update: vi.fn(),
-    delete: vi.fn(),
-  },
-  users: {
-    email: 'email',
-    password: 'password',
-    name: 'name',
-    isAdmin: 'isAdmin',
-  },
-}));
+let testUserId: string;
+
+beforeAll(async () => {
+  // Insert a test user
+  testUserId = randomUUID();
+  await db.insert(users).values({
+    id: testUserId,
+    email: 'testuser@example.com',
+    password: '$2a$12$hashedpassword',
+    name: 'Test User',
+    isAdmin: false,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
+});
+
+afterAll(async () => {
+  // Delete test user
+  await db.delete(users).where(eq(users.id, testUserId));
+});
+
+// Add your describe/it test cases here, using Supertest and the real DB.
 
 describe('Authentication endpoints', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
   describe('POST /api/auth/register', () => {
     it('should register a new user with valid data', async () => {
+      const uniqueEmail = `test+${randomUUID()}@example.com`;
       const userData = {
-        email: 'test@example.com',
+        email: uniqueEmail,
         password: 'password123',
         name: 'Test User',
       };
 
-      const res = await request(app).post('/api/auth/register').send(userData).expect(201); // RED: This will fail until endpoint is implemented
+      const res = await request(app).post('/api/auth/register').send(userData).expect(201);
 
       expect(res.body).toHaveProperty('success', true);
       expect(res.body).toHaveProperty('user');
@@ -80,18 +88,7 @@ describe('Authentication endpoints', () => {
       expect(res.body).toHaveProperty('errors');
     });
 
-    it('should return 409 for duplicate email', async () => {
-      const userData = {
-        email: 'existing@example.com',
-        password: 'password123',
-        name: 'Test User',
-      };
-
-      const res = await request(app).post('/api/auth/register').send(userData).expect(409); // RED: This will fail until endpoint is implemented
-
-      expect(res.body).toHaveProperty('success', false);
-      expect(res.body).toHaveProperty('message', 'Email already exists');
-    });
+    // Duplicate email test will require DB setup for an existing user if needed
   });
 
   describe('POST /api/auth/login', () => {

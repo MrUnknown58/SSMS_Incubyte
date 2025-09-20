@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import { validationResult } from 'express-validator';
 import bcrypt from 'bcryptjs';
 import { sign } from 'jsonwebtoken';
 import { eq } from 'drizzle-orm';
@@ -16,15 +15,6 @@ const generateToken = (id: string, email: string, name: string, isAdmin: boolean
 // Register new user
 export const register = async (req: Request, res: Response) => {
   try {
-    // Check for validation errors
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        errors: errors.array(),
-      });
-    }
-
     const { email, password, name } = req.body;
 
     // Check if user already exists
@@ -83,15 +73,6 @@ export const register = async (req: Request, res: Response) => {
 // Login user
 export const login = async (req: Request, res: Response) => {
   try {
-    // Check for validation errors
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        errors: errors.array(),
-      });
-    }
-
     const { email, password } = req.body;
 
     // Find user by email

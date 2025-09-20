@@ -12,7 +12,7 @@ describe('JWT Middleware', () => {
   let invalidToken: string;
 
   beforeEach(() => {
-    const payload = { id: '1', email: 'test@example.com', role: 'user' };
+    const payload = { id: '1', email: 'test@example.com', name: 'Test User', isAdmin: false };
     validToken = jwt.sign(payload, process.env.JWT_SECRET || 'test-secret', { expiresIn: '1h' });
     expiredToken = jwt.sign(payload, process.env.JWT_SECRET || 'test-secret', { expiresIn: '-1h' });
     invalidToken = 'invalid.token.here';
@@ -63,12 +63,12 @@ describe('JWT Middleware', () => {
 
     beforeEach(() => {
       userToken = jwt.sign(
-        { id: '1', email: 'user@example.com', role: 'user' },
+        { id: '1', email: 'user@example.com', name: 'Regular User', isAdmin: false },
         process.env.JWT_SECRET || 'test-secret',
         { expiresIn: '1h' }
       );
       adminToken = jwt.sign(
-        { id: '2', email: 'admin@example.com', role: 'admin' },
+        { id: '2', email: 'admin@example.com', name: 'Admin User', isAdmin: true },
         process.env.JWT_SECRET || 'test-secret',
         { expiresIn: '1h' }
       );

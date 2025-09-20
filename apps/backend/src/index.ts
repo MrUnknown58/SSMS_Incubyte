@@ -35,35 +35,41 @@ app.use(
   })
 );
 
-// Rate limiting for auth endpoints
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // Limit each IP to 5 requests per windowMs
-  message: {
-    success: false,
-    error: 'Too Many Requests',
-    message: 'Too many authentication attempts, please try again later',
-    timestamp: new Date().toISOString(),
-    path: '/api/auth',
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
+// Rate limiting for auth endpoints (disabled in test environment)
+const authLimiter =
+  process.env.NODE_ENV === 'test'
+    ? (_req: express.Request, _res: express.Response, next: express.NextFunction) => next() // Skip rate limiting in tests
+    : rateLimit({
+        windowMs: 15 * 60 * 1000, // 15 minutes
+        max: 5, // Limit each IP to 5 requests per windowMs
+        message: {
+          success: false,
+          error: 'Too Many Requests',
+          message: 'Too many authentication attempts, please try again later',
+          timestamp: new Date().toISOString(),
+          path: '/api/auth',
+        },
+        standardHeaders: true,
+        legacyHeaders: false,
+      });
 
-// General rate limiting
-const generalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
-  message: {
-    success: false,
-    error: 'Too Many Requests',
-    message: 'Too many requests, please try again later',
-    timestamp: new Date().toISOString(),
-    path: '',
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
+// General rate limiting (disabled in test environment)
+const generalLimiter =
+  process.env.NODE_ENV === 'test'
+    ? (_req: express.Request, _res: express.Response, next: express.NextFunction) => next() // Skip rate limiting in tests
+    : rateLimit({
+        windowMs: 15 * 60 * 1000, // 15 minutes
+        max: 100, // Limit each IP to 100 requests per windowMs
+        message: {
+          success: false,
+          error: 'Too Many Requests',
+          message: 'Too many requests, please try again later',
+          timestamp: new Date().toISOString(),
+          path: '',
+        },
+        standardHeaders: true,
+        legacyHeaders: false,
+      });
 
 app.use(express.json({ limit: '10mb' }));
 app.use(generalLimiter);

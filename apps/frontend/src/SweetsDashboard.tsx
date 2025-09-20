@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react';
 import { useAuth } from './hooks';
 import { toast } from 'sonner';
 import api from './lib/api';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 interface Sweet {
   id: string;
@@ -167,10 +170,10 @@ function SweetsDashboard() {
             />
           </svg>
         </div>
-        <input
+        <Input
           type="text"
           placeholder="Search sweets by name..."
-          className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 text-gray-700 placeholder-gray-400"
+          className="pl-10"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -241,17 +244,17 @@ function SweetsDashboard() {
                   <h3 className="font-bold text-xl text-gray-800 group-hover:text-blue-600 transition-colors">
                     {sweet.name}
                   </h3>
-                  <div
-                    className={`px-3 py-1 rounded-full text-xs font-medium ${
+                  <Badge
+                    variant={
                       sweet.quantity > 10
-                        ? 'bg-green-100 text-green-700'
+                        ? 'success'
                         : sweet.quantity > 0
-                          ? 'bg-yellow-100 text-yellow-700'
-                          : 'bg-red-100 text-red-700'
-                    }`}
+                          ? 'warning'
+                          : 'destructive'
+                    }
                   >
                     {sweet.quantity > 0 ? `${sweet.quantity} left` : 'Out of stock'}
-                  </div>
+                  </Badge>
                 </div>
                 <div className="inline-block px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-full mb-3">
                   {sweet.category}
@@ -274,12 +277,8 @@ function SweetsDashboard() {
                 </div>
               </div>
 
-              <button
-                className={`w-full py-3 px-6 rounded-xl font-semibold transition-all duration-200 transform ${
-                  sweet.quantity === 0 || purchasingIds.has(sweet.id)
-                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                    : 'bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700 hover:scale-105 shadow-lg hover:shadow-xl'
-                }`}
+              <Button
+                className="w-full py-3 px-6 rounded-xl"
                 disabled={sweet.quantity === 0 || purchasingIds.has(sweet.id)}
                 onClick={() => handlePurchase(sweet.id, sweet.name)}
               >
@@ -329,7 +328,7 @@ function SweetsDashboard() {
                     Purchase (1 item)
                   </span>
                 )}
-              </button>
+              </Button>
             </div>
           ))}
       </div>

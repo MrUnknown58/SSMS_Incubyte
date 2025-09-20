@@ -81,7 +81,7 @@ export const errorHandler = (
     message,
     timestamp,
     path,
-    ...(details && { details }),
+    ...(details && { details, errors: details }), // Add errors property for test compatibility
   };
 
   res.status(statusCode).json(errorResponse);
