@@ -336,37 +336,17 @@ The following screenshots demonstrate the working Sweet Shop application with co
 
 #### 📷 Screenshot Collection
 
-**Note**: Screenshots have been captured demonstrating the following functionality:
+**Note**: Screenshots have been captured demonstrating the following functionality. See `/screenshots/` folder for images.
 
-1. **Authentication Flow**
-   - User registration form with validation
-   - User login with JWT token generation
-   - Password security with bcrypt hashing
-   - Input validation for email formats and password strength
+![Authentication Flow](screenshots/auth-flow.png)
+![Dashboard Interface](screenshots/dashboard.png)
+![Admin Panel](screenshots/admin-panel.png)
+![Purchase & Restock](screenshots/purchase-restock.png)
+![Error Handling](screenshots/error-handling.png)
 
-2. **Dashboard Interface**
-   - Modern shadcn/ui component design
-   - Responsive layout with navigation
-   - Sweet inventory display with cards
-   - Search and filter functionality
+If deployed, view the live app here:
 
-3. **Admin Panel**
-   - Admin-only access to CRUD operations
-   - Sweet creation and editing forms
-   - Inventory management interface
-   - User role verification system
-
-4. **Purchase & Restock Operations**
-   - Purchase flow with quantity selection
-   - Stock validation and error handling
-   - Restock interface for admin users
-   - Real-time inventory updates
-
-5. **Error Handling & Validation**
-   - Form validation with clear error messages
-   - API error responses with user-friendly feedback
-   - Loading states and success confirmations
-   - 404 and unauthorized access handling
+**Live Demo:** [https://your-app.vercel.app](https://your-app.vercel.app)
 
 #### 🔧 Technical Implementation Highlights
 
