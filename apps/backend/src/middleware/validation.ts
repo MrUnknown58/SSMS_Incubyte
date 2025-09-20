@@ -8,7 +8,7 @@ import {
   PurchaseSchema,
   RestockSchema,
   SearchSweetsSchema,
-} from '@sweet-shop/types';
+} from '../shared/types';
 
 // Generic Zod validation middleware
 export const validateSchema = (schema: ZodType) => {

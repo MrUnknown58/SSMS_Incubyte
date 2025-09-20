@@ -8,7 +8,7 @@ import {
   ConflictError,
   InsufficientStockError,
   ErrorResponse,
-} from '@sweet-shop/types';
+} from '../shared/types';
 
 export const errorHandler = (
   error: Error,
