@@ -8,5 +8,10 @@ export default defineConfig({
     env: {
       NODE_ENV: 'test',
     },
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
+      exclude: ['node_modules/', 'tests/', 'dist/', 'drizzle/', '**/*.config.*', '**/*.d.ts'],
+    },
   },
 });

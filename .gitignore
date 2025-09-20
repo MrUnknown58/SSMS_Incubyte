@@ -11,7 +11,8 @@ coverage/
 .idea/
 
 
-README.md
+# README.md
+apps/frontend/README.md
 SPEC_COMPLIANCE.md
 AI_USAGE_LOG.md
 ini_structure.md
