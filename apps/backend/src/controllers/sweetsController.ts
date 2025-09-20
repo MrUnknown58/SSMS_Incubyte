@@ -1,12 +1,11 @@
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { validationResult } from 'express-validator';
 import { eq, like, and, gte, lte } from 'drizzle-orm';
 
 import { db, sweets, purchases, type NewSweet, type NewPurchase } from '../db';
-import { AuthenticatedRequest } from '../middleware/auth';
 
 // Get all sweets
-export const getAllSweets = async (req: AuthenticatedRequest, res: Response) => {
+export const getAllSweets = async (req: Request, res: Response) => {
   try {
     const allSweets = await db.select().from(sweets);
 
@@ -24,7 +23,7 @@ export const getAllSweets = async (req: AuthenticatedRequest, res: Response) => 
 };
 
 // Create new sweet
-export const createSweet = async (req: AuthenticatedRequest, res: Response) => {
+export const createSweet = async (req: Request, res: Response) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -35,6 +34,15 @@ export const createSweet = async (req: AuthenticatedRequest, res: Response) => {
     }
 
     const { name, category, price, quantity, description } = req.body;
+
+    // Check for duplicate name
+    const existingSweet = await db.select().from(sweets).where(eq(sweets.name, name));
+    if (existingSweet.length > 0) {
+      return res.status(409).json({
+        success: false,
+        message: `Sweet with name '${name}' already exists`,
+      });
+    }
 
     const newSweet: NewSweet = {
       name,
@@ -60,7 +68,7 @@ export const createSweet = async (req: AuthenticatedRequest, res: Response) => {
 };
 
 // Search sweets
-export const searchSweets = async (req: AuthenticatedRequest, res: Response) => {
+export const searchSweets = async (req: Request, res: Response) => {
   try {
     const { name, category, minPrice, maxPrice } = req.query;
 
@@ -106,7 +114,7 @@ export const searchSweets = async (req: AuthenticatedRequest, res: Response) => 
 };
 
 // Update sweet
-export const updateSweet = async (req: AuthenticatedRequest, res: Response) => {
+export const updateSweet = async (req: Request, res: Response) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -187,7 +195,7 @@ export const deleteSweet = async (req: AuthenticatedRequest, res: Response) => {
 };
 
 // Purchase sweet
-export const purchaseSweet = async (req: AuthenticatedRequest, res: Response) => {
+export const purchaseSweet = async (req: Request, res: Response) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -199,7 +207,7 @@ export const purchaseSweet = async (req: AuthenticatedRequest, res: Response) =>
 
     const { id } = req.params;
     const { quantity } = req.body;
-    const userId = req.user!.userId;
+    const userId = req.user!.id;
 
     // Get sweet details
     const [sweet] = await db.select().from(sweets).where(eq(sweets.id, id)).limit(1);

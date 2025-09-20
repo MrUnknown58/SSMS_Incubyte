@@ -28,11 +28,11 @@ router.get('/', getAllSweets);
 // GET /api/sweets/search - Search sweets
 router.get('/search', searchSweets);
 
-// POST /api/sweets - Create new sweet
-router.post('/', validateCreateSweet, createSweet);
+// POST /api/sweets - Create new sweet (Admin only)
+router.post('/', requireAdmin, validateCreateSweet, createSweet);
 
-// PUT /api/sweets/:id - Update sweet
-router.put('/:id', validateUpdateSweet, updateSweet);
+// PUT /api/sweets/:id - Update sweet (Admin only)
+router.put('/:id', requireAdmin, validateUpdateSweet, updateSweet);
 
 // DELETE /api/sweets/:id - Delete sweet (Admin only)
 router.delete('/:id', requireAdmin, deleteSweet);
