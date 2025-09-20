@@ -26,14 +26,29 @@ app.use(
 );
 
 // CORS configuration
-app.use(
-  cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-  })
-);
+const allowedOrigins = [
+  process.env.FRONTEND_URL, // set to your Vercel production domain e.g. https://your-app.vercel.app
+  'http://localhost:5173',
+].filter(Boolean) as string[];
+
+const corsOptions: cors.CorsOptions = {
+  origin(origin, callback) {
+    if (!origin) return callback(null, true);
+    try {
+      const hostname = new URL(origin).hostname;
+      const isAllowed = allowedOrigins.includes(origin) || hostname.endsWith('.vercel.app'); // allow Vercel preview URLs
+      return isAllowed ? callback(null, true) : callback(new Error('Not allowed by CORS'));
+    } catch {
+      return callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 // Rate limiting for auth endpoints (disabled in test environment)
 const authLimiter =
