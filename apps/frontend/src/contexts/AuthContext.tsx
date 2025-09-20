@@ -1,6 +1,6 @@
 ﻿import React, { createContext, useState, useEffect, type ReactNode } from 'react';
 
-import { type AuthResponse } from '@sweet-shop/types';
+import type { AuthResponse } from '../types';
 
 import api from '../lib/api';
 

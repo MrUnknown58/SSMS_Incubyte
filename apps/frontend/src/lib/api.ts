@@ -1,17 +1,17 @@
-﻿import {
-  type RegisterUser,
-  type LoginUser,
-  type CreateSweet,
-  type UpdateSweet,
-  type Purchase,
-  type Restock,
-  type SearchSweets,
-  type AuthResponse,
-  type SweetResponse,
-  type SweetsListResponse,
-  type PurchaseResponse,
-  type ErrorResponse,
-} from '@sweet-shop/types';
+﻿import type {
+  RegisterUser,
+  LoginUser,
+  CreateSweet,
+  UpdateSweet,
+  Purchase,
+  Restock,
+  SearchSweets,
+  AuthResponse,
+  SweetResponse,
+  SweetsListResponse,
+  PurchaseResponse,
+  ErrorResponse,
+} from '../types';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
