@@ -49,8 +49,8 @@ function AuthLogin() {
             </svg>
           </div>
           <h2 className="text-2xl font-bold mb-2 gradient-text">Welcome Back!</h2>
-          <p className="text-gray-600 dark:text-gray-300 font-medium">{user.email}</p>
-          <div className="inline-block px-3 py-1 text-sm rounded-full mt-2 font-medium bg-gray-100 dark:bg-[hsl(230_14%_18%)] text-gray-700 dark:text-[hsl(220_9%_62%)]">
+          <p className="text-gray-600 font-medium">{user.email}</p>
+          <div className="inline-block px-3 py-1 text-sm rounded-full mt-2 font-medium bg-gray-100  text-gray-700 ">
             {user.isAdmin ? '👑 Admin' : '👤 User'}
           </div>
         </div>
@@ -60,18 +60,18 @@ function AuthLogin() {
 
   return (
     <div className="max-w-md mx-auto animate-in fade-in-50 slide-in-from-bottom-4 duration-500">
-      <Card className="overflow-hidden bg-white dark:bg-[hsl(217_19%_12%)] border border-gray-200 dark:border-[hsl(230_14%_18%)] rounded-2xl shadow-lg">
+      <Card className="overflow-hidden bg-white  border border-gray-200  rounded-2xl shadow-lg">
         <CardHeader className="text-center">
           <h2 className="text-3xl font-bold gradient-text">Welcome Back</h2>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">Sign in to your account</p>
+          <p className="text-gray-600 mt-2">Sign in to your account</p>
         </CardHeader>
         <CardContent>
           <form className="space-y-6" onSubmit={handleLogin}>
             {error && (
-              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg animate-in slide-in-from-left-5 duration-300">
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg animate-in slide-in-from-left-5 duration-300">
                 <div className="flex items-center">
                   <svg
-                    className="w-5 h-5 mr-2 text-red-500 dark:text-red-400"
+                    className="w-5 h-5 mr-2 text-red-500"
                     fill="currentColor"
                     viewBox="0 0 20 20"
                   >
@@ -81,13 +81,13 @@ function AuthLogin() {
                       clipRule="evenodd"
                     />
                   </svg>
-                  <span className="font-medium text-red-700 dark:text-red-300">{error}</span>
+                  <span className="font-medium text-red-700">{error}</span>
                 </div>
               </div>
             )}
 
             <div>
-              <Label className="text-gray-700 dark:text-gray-300">Email Address</Label>
+              <Label className="text-gray-700">Email Address</Label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg
@@ -116,7 +116,7 @@ function AuthLogin() {
             </div>
 
             <div>
-              <Label className="text-gray-700 dark:text-gray-300">Password</Label>
+              <Label className="text-gray-700">Password</Label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg
@@ -173,12 +173,10 @@ function AuthLogin() {
               )}
             </Button>
 
-            <div className="p-4 rounded-xl bg-gray-50 dark:bg-[hsl(217_19%_12%)] border border-gray-200 dark:border-[hsl(230_14%_18%)]">
-              <p className="text-sm text-gray-700 dark:text-gray-300 font-medium mb-1">
-                Demo Account:
-              </p>
-              <p className="text-xs text-gray-600 dark:text-gray-400">📧 admin@example.com</p>
-              <p className="text-xs text-gray-600 dark:text-gray-400">🔑 password123</p>
+            <div className="p-4 rounded-xl bg-gray-50 border border-gray-200 ">
+              <p className="text-sm text-gray-700  font-medium mb-1">Demo Account:</p>
+              <p className="text-xs text-gray-600">📧 admin@example.com</p>
+              <p className="text-xs text-gray-600">🔑 password123</p>
             </div>
           </form>
         </CardContent>

@@ -51,7 +51,7 @@ function AuthRegister() {
             </svg>
           </div>
           <h2 className="text-2xl font-bold mb-2 gradient-text">Already Registered</h2>
-          <p className="text-gray-600 dark:text-gray-300 font-medium">{user.email}</p>
+          <p className="text-gray-600 font-medium">{user.email}</p>
           <div
             className="inline-block px-3 py-1 text-sm rounded-full mt-2 font-medium"
             style={{ background: 'hsl(230 14% 18%)', color: 'hsl(220 9% 62%)' }}
@@ -65,15 +65,15 @@ function AuthRegister() {
 
   return (
     <div className="max-w-md mx-auto animate-in fade-in-50 slide-in-from-bottom-4 duration-500">
-      <Card className="overflow-hidden bg-white dark:bg-[hsl(217_19%_12%)] border border-gray-200 dark:border-[hsl(230_14%_18%)] rounded-2xl shadow-lg">
+      <Card className="overflow-hidden bg-white border border-gray-200 rounded-2xl shadow-lg">
         <CardHeader className="text-center">
           <h2 className="text-3xl font-bold gradient-text">Join Us</h2>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">Create your sweet shop account</p>
+          <p className="text-gray-600 mt-2">Create your sweet shop account</p>
         </CardHeader>
         <CardContent>
           <form className="space-y-6" onSubmit={handleRegister}>
             {error && (
-              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg animate-in slide-in-from-left-5 duration-300">
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg animate-in slide-in-from-left-5 duration-300">
                 <div className="flex items-center">
                   <svg
                     className="w-5 h-5 mr-2"
@@ -93,7 +93,7 @@ function AuthRegister() {
             )}
 
             <div>
-              <Label className="text-gray-700 dark:text-gray-300">Email Address</Label>
+              <Label className="text-gray-700">Email Address</Label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg
@@ -122,7 +122,7 @@ function AuthRegister() {
             </div>
 
             <div>
-              <Label className="text-gray-700 dark:text-gray-300">Full Name</Label>
+              <Label className="text-gray-700">Full Name</Label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg
@@ -151,7 +151,7 @@ function AuthRegister() {
             </div>
 
             <div>
-              <Label className="text-gray-700 dark:text-gray-300">Password</Label>
+              <Label className="text-gray-700">Password</Label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg
@@ -181,7 +181,7 @@ function AuthRegister() {
             </div>
 
             <div>
-              <Label className="text-gray-700 dark:text-gray-300">Account Type</Label>
+              <Label className="text-gray-700">Account Type</Label>
               <div className="grid grid-cols-2 gap-3">
                 <Button
                   type="button"
@@ -239,7 +239,7 @@ function AuthRegister() {
               )}
             </Button>
 
-            <div className="p-4 rounded-xl bg-gray-50 dark:bg-[hsl(217_19%_12%)] border border-gray-200 dark:border-[hsl(230_14%_18%)]">
+            <div className="p-4 rounded-xl bg-gray-50 border border-gray-200">
               <p className="text-sm text-gray-400 text-center">
                 🔒 Your information is secure and encrypted
               </p>

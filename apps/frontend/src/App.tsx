@@ -37,7 +37,7 @@ function Layout({ children }: { children: React.ReactNode }) {
           <div className="text-center">
             <p className="text-sm text-gray-600">
               © 2025 Sweet Shop Management System -
-              <span className="font-medium text-blue-600"> UI Refactor In Progress</span>
+              {/* <span className="font-medium text-blue-600"> UI Refactor In Progress</span> */}
             </p>
           </div>
         </Container>
