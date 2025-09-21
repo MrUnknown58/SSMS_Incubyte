@@ -3,73 +3,133 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom theme variables */
+/* Design tokens inspired by Personal.ai */
 :root {
-  --radius: 0.625rem;
-  
-  /* Light mode colors */
-  --color-background: oklch(1 0 0);
-  --color-foreground: oklch(0.145 0 0);
-  --color-card: oklch(1 0 0);
-  --color-card-foreground: oklch(0.145 0 0);
-  --color-primary: oklch(0.205 0 0);
-  --color-primary-foreground: oklch(0.985 0 0);
-  --color-secondary: oklch(0.97 0 0);
-  --color-secondary-foreground: oklch(0.205 0 0);
-  --color-muted: oklch(0.97 0 0);
-  --color-muted-foreground: oklch(0.556 0 0);
-  --color-destructive: oklch(0.577 0.245 27.325);
-  --color-border: oklch(0.922 0 0);
-  --color-input: oklch(0.922 0 0);
-  --color-ring: oklch(0.708 0 0);
+  /* Radii & elevation */
+  --radius: 12px;
+  --elevation-1: 0 2px 12px rgba(0,0,0,0.25);
+  --elevation-2: 0 6px 24px rgba(0,0,0,0.35);
+
+  /* Dark-first brand palette */
+  --brand-bg: hsl(230 19% 10%);          /* Deep slate */
+  --brand-surface: hsl(230 19% 14%);     /* Card surface */
+  --brand-overlay: hsl(230 18% 18%);
+  --brand-text: hsl(220 13% 95%);        /* High contrast */
+  --brand-muted: hsl(220 9% 62%);
+  --brand-border: hsl(230 12% 22%);
+
+  --brand-primary: hsl(262 83% 60%);     /* Electric purple */
+  --brand-accent: hsl(190 95% 50%);      /* Vivid cyan */
+  --brand-accent-2: hsl(318 95% 62%);    /* Magenta */
+  --brand-success: hsl(150 65% 46%);
+  --brand-danger: hsl(350 75% 55%);
+
+  /* Derived tokens */
+  --brand-gradient: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-accent) 100%);
+  --brand-glow: 0 0 0 / 0 rgba(0,0,0,0);
+
+  /* Semantic mapping used by components */
+  --color-background: var(--brand-bg);
+  --color-foreground: var(--brand-text);
+  --color-card: var(--brand-surface);
+  --color-card-foreground: var(--brand-text);
+  --color-primary: var(--brand-primary);
+  --color-primary-foreground: hsl(0 0% 100%);
+  --color-secondary: var(--brand-overlay);
+  --color-secondary-foreground: var(--brand-text);
+  --color-muted: var(--brand-muted);
+  --color-muted-foreground: var(--brand-muted);
+  --color-destructive: var(--brand-danger);
+  --color-border: var(--brand-border);
+  --color-input: var(--brand-overlay);
+  --color-ring: var(--brand-accent);
 }
 
 /* Dark mode theme override */
-.dark {
-  --color-background: oklch(0.145 0 0);
-  --color-foreground: oklch(0.985 0 0);
-  --color-card: oklch(0.205 0 0);
-  --color-card-foreground: oklch(0.985 0 0);
-  --color-primary: oklch(0.922 0 0);
-  --color-primary-foreground: oklch(0.205 0 0);
-  --color-secondary: oklch(0.269 0 0);
-  --color-secondary-foreground: oklch(0.985 0 0);
-  --color-muted: oklch(0.269 0 0);
-  --color-muted-foreground: oklch(0.708 0 0);
-  --color-destructive: oklch(0.704 0.191 22.216);
-  --color-border: oklch(1 0 0 / 10%);
-  --color-input: oklch(1 0 0 / 15%);
-  --color-ring: oklch(0.556 0 0);
+/* Optional light mode override */
+.light {
+  --color-background: hsl(0 0% 100%);
+  --color-foreground: hsl(230 15% 12%);
+  --color-card: hsl(0 0% 100%);
+  --color-card-foreground: hsl(230 15% 12%);
+  --color-primary: hsl(262 83% 56%);
+  --color-primary-foreground: hsl(0 0% 100%);
+  --color-secondary: hsl(230 10% 96%);
+  --color-secondary-foreground: hsl(230 15% 20%);
+  --color-muted: hsl(230 10% 45%);
+  --color-muted-foreground: hsl(230 10% 45%);
+  --color-destructive: hsl(350 75% 50%);
+  --color-border: hsl(230 17% 91%);
+  --color-input: hsl(230 17% 96%);
+  --color-ring: hsl(190 95% 45%);
 }
 
 /* Custom component styles using traditional approach */
 @layer components {
   .input {
-    @apply px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+    @apply px-3 py-2 rounded-md focus:outline-none focus:ring-2 transition;
+    background-color: var(--color-input);
+    color: var(--color-foreground);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--elevation-1);
   }
-  
+
   .btn {
-    @apply px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply px-5 py-2.5 text-white rounded-md font-medium inline-flex items-center justify-center transition;
+    background-image: var(--brand-gradient);
+    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.35), 0 4px 16px rgba(34, 211, 238, 0.25);
   }
-  
+  .btn:hover { filter: brightness(1.05); }
+  .btn:disabled { @apply opacity-50 cursor-not-allowed; }
+
   .btn-secondary {
-    @apply px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2;
+    @apply px-5 py-2.5 rounded-md font-medium transition text-white/90;
+    background: linear-gradient(135deg, hsl(230 10% 22%), hsl(230 12% 18%));
+    border: 1px solid var(--color-border);
   }
-  
+  .btn-secondary:hover { filter: brightness(1.06); }
+
   .card {
-    @apply bg-white rounded-lg shadow-md border border-gray-200;
+    @apply rounded-xl overflow-hidden;
+    background-color: var(--color-card);
+    color: var(--color-card-foreground);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--elevation-1);
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-2 px-3 py-1 text-xs rounded-full;
+    background: hsl(230 14% 18%);
+    border: 1px solid var(--color-border);
+    color: var(--color-foreground);
   }
 }
 
 /* Base styles */
 @layer base {
   * {
-    @apply border-gray-200;
+    border-color: var(--color-border);
   }
   
   body {
-    @apply bg-white text-gray-900 font-sans;
+    @apply font-sans antialiased;
+    color: var(--color-foreground);
+    background-color: var(--color-background);
+    background-image: radial-gradient(1200px 600px at 10% -10%, hsl(262 83% 20% / 0.35), transparent 60%),
+                      radial-gradient(1200px 600px at 110% 10%, hsl(190 95% 20% / 0.30), transparent 60%);
+    background-attachment: fixed;
     margin: 0;
     min-height: 100vh;
+  }
+  
+  /* Headings with subtle gradient text */
+  h1, h2, h3 {
+    letter-spacing: -0.02em;
+  }
+  .gradient-text {
+    background: linear-gradient(135deg, var(--brand-primary), var(--brand-accent));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
 }

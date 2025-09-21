@@ -3,8 +3,8 @@ import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 
 export default function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
-  const isDark = theme === 'dark';
+  const { setTheme } = useTheme();
+  const isDark = false;
   return (
     <Button
       variant="secondary"

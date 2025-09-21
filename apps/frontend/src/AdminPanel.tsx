@@ -153,8 +153,8 @@ function AdminPanel() {
   if (!user) {
     return (
       <div className="max-w-md mx-auto text-center animate-in fade-in-50 duration-500">
-        <div className="bg-gradient-to-br from-red-50 to-pink-100 rounded-2xl p-8 shadow-lg border-2 border-red-200">
-          <div className="w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
+        <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-lg">
+          <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
             <svg
               className="w-8 h-8 text-red-600"
               fill="none"
@@ -169,8 +169,8 @@ function AdminPanel() {
               />
             </svg>
           </div>
-          <h2 className="text-2xl font-bold mb-4 text-red-800">Authentication Required</h2>
-          <p className="text-red-700 leading-relaxed">Please login to access admin features.</p>
+          <h2 className="text-2xl font-bold mb-4 text-gray-800">Authentication Required</h2>
+          <p className="text-gray-600 leading-relaxed">Please login to access admin features.</p>
         </div>
       </div>
     );
@@ -179,8 +179,8 @@ function AdminPanel() {
   if (!user.isAdmin) {
     return (
       <div className="max-w-md mx-auto text-center animate-in fade-in-50 duration-500">
-        <div className="bg-gradient-to-br from-yellow-50 to-orange-100 rounded-2xl p-8 shadow-lg border-2 border-yellow-200">
-          <div className="w-16 h-16 mx-auto mb-4 bg-yellow-100 rounded-full flex items-center justify-center">
+        <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-lg">
+          <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
             <svg
               className="w-8 h-8 text-yellow-600"
               fill="none"
@@ -195,11 +195,11 @@ function AdminPanel() {
               />
             </svg>
           </div>
-          <h2 className="text-2xl font-bold mb-4 text-yellow-800">Admin Access Required</h2>
-          <p className="text-yellow-700 leading-relaxed">
+          <h2 className="text-2xl font-bold mb-4 text-gray-800">Admin Access Required</h2>
+          <p className="text-gray-600 leading-relaxed">
             You need admin privileges to access this area.
           </p>
-          <div className="mt-4 px-4 py-2 bg-yellow-200 text-yellow-800 rounded-lg inline-block font-medium">
+          <div className="mt-4 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg inline-block font-medium">
             Current Role: {user.isAdmin ? '👑 Admin' : '👤 User'}
           </div>
         </div>
@@ -208,35 +208,12 @@ function AdminPanel() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto animate-in fade-in-50 duration-700">
-      <div className="mb-8">
-        <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl p-8 text-white shadow-xl">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-4xl font-bold mb-2">👑 Admin Dashboard</h1>
-              <p className="text-purple-100 text-lg">
-                Manage your sweet shop inventory and pricing
-              </p>
-            </div>
-            <div className="hidden md:block">
-              <div className="w-20 h-20 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                <svg
-                  className="w-10 h-10 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                  />
-                </svg>
-              </div>
-            </div>
-          </div>
-        </div>
+    <div className="max-w-7xl mx-auto animate-in fade-in-50 duration-700 px-4 md:px-6 lg:px-0">
+      <div className="mb-8 text-center">
+        <h1 className="text-4xl font-bold mb-3 text-gray-800">👑 Admin Dashboard</h1>
+        <p className="text-xl text-gray-600 leading-relaxed">
+          Manage your sweet shop inventory and pricing
+        </p>
       </div>
 
       {/* Sweet Form */}
@@ -295,10 +272,10 @@ function AdminPanel() {
 
               <div className="space-y-6">
                 <div>
-                  <Label>Price ($) *</Label>
+                  <Label>Price (₹) *</Label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <span className="text-gray-500 text-lg">$</span>
+                      <span className="text-gray-500 text-lg">₹</span>
                     </div>
                     <Input
                       type="number"
@@ -541,7 +518,7 @@ function AdminPanel() {
                               />
                             </svg>
                             <span className="text-2xl font-bold text-green-600">
-                              ${sweet.price}
+                              ₹{sweet.price}
                             </span>
                           </div>
                           <div className="flex items-center space-x-2">

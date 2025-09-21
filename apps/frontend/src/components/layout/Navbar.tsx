@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks';
-import ThemeToggle from '@/components/ThemeToggle';
 import Container from './Container';
 
 export default function Navbar() {
@@ -39,7 +38,6 @@ export default function Navbar() {
           </nav>
 
           <div className="flex items-center gap-3">
-            <ThemeToggle />
             {user ? (
               <button
                 onClick={logout}

@@ -29,29 +29,34 @@ function AuthRegister() {
 
   if (user) {
     return (
-      <div className="max-w-md mx-auto animate-in fade-in-50 duration-500">
-        <div className="bg-gradient-to-br from-green-50 to-emerald-100 border-2 border-green-200 rounded-2xl p-8 shadow-lg">
-          <div className="text-center mb-4">
-            <div className="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center">
-              <svg
-                className="w-8 h-8 text-green-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
-            <h2 className="text-2xl font-bold mb-2 text-green-800">Already Registered</h2>
-            <p className="text-green-700 font-medium">{user.email}</p>
-            <div className="inline-block px-3 py-1 bg-green-200 text-green-800 text-sm rounded-full mt-2 font-medium">
-              {user.isAdmin ? '👑 Admin' : '👤 User'}
-            </div>
+      <div className="max-w-md mx-auto animate-in fade-in-50 duration-500 py-8">
+        <div className="card p-8 text-center">
+          <div
+            className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center"
+            style={{ background: 'hsl(230 14% 18%)' }}
+          >
+            <svg
+              className="w-8 h-8"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              style={{ color: 'hsl(150 65% 46%)' }}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold mb-2 gradient-text">Already Registered</h2>
+          <p className="text-gray-600 dark:text-gray-300 font-medium">{user.email}</p>
+          <div
+            className="inline-block px-3 py-1 text-sm rounded-full mt-2 font-medium"
+            style={{ background: 'hsl(230 14% 18%)', color: 'hsl(220 9% 62%)' }}
+          >
+            {user.isAdmin ? '👑 Admin' : '👤 User'}
           </div>
         </div>
       </div>
@@ -60,20 +65,21 @@ function AuthRegister() {
 
   return (
     <div className="max-w-md mx-auto animate-in fade-in-50 slide-in-from-bottom-4 duration-500">
-      <Card className="overflow-hidden">
-        <CardHeader className="bg-gradient-to-r from-green-600 to-teal-600 text-center">
-          <h2 className="text-3xl font-bold text-white">Join Us</h2>
-          <p className="text-green-100 mt-2">Create your sweet shop account</p>
+      <Card className="overflow-hidden bg-white dark:bg-[hsl(217_19%_12%)] border border-gray-200 dark:border-[hsl(230_14%_18%)] rounded-2xl shadow-lg">
+        <CardHeader className="text-center">
+          <h2 className="text-3xl font-bold gradient-text">Join Us</h2>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">Create your sweet shop account</p>
         </CardHeader>
         <CardContent>
           <form className="space-y-6" onSubmit={handleRegister}>
             {error && (
-              <div className="bg-red-50 border-l-4 border-red-400 text-red-700 px-4 py-3 rounded-r-lg animate-in slide-in-from-left-5 duration-300">
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg animate-in slide-in-from-left-5 duration-300">
                 <div className="flex items-center">
                   <svg
-                    className="w-5 h-5 mr-2 text-red-500"
+                    className="w-5 h-5 mr-2"
                     fill="currentColor"
                     viewBox="0 0 20 20"
+                    style={{ color: 'hsl(0 84% 60%)' }}
                   >
                     <path
                       fillRule="evenodd"
@@ -81,13 +87,13 @@ function AuthRegister() {
                       clipRule="evenodd"
                     />
                   </svg>
-                  <span className="font-medium">{error}</span>
+                  <span className="font-medium text-gray-100">{error}</span>
                 </div>
               </div>
             )}
 
             <div>
-              <Label>Email Address</Label>
+              <Label className="text-gray-700 dark:text-gray-300">Email Address</Label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg
@@ -107,7 +113,7 @@ function AuthRegister() {
                 <Input
                   type="email"
                   placeholder="Enter your email"
-                  className="pl-10"
+                  className="pl-10 input"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -116,7 +122,7 @@ function AuthRegister() {
             </div>
 
             <div>
-              <Label>Full Name</Label>
+              <Label className="text-gray-700 dark:text-gray-300">Full Name</Label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg
@@ -136,7 +142,7 @@ function AuthRegister() {
                 <Input
                   type="text"
                   placeholder="Enter your full name"
-                  className="pl-10"
+                  className="pl-10 input"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
@@ -145,7 +151,7 @@ function AuthRegister() {
             </div>
 
             <div>
-              <Label>Password</Label>
+              <Label className="text-gray-700 dark:text-gray-300">Password</Label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg
@@ -165,7 +171,7 @@ function AuthRegister() {
                 <Input
                   type="password"
                   placeholder="Minimum 8 characters"
-                  className="pl-10"
+                  className="pl-10 input"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -175,12 +181,12 @@ function AuthRegister() {
             </div>
 
             <div>
-              <Label>Account Type</Label>
+              <Label className="text-gray-700 dark:text-gray-300">Account Type</Label>
               <div className="grid grid-cols-2 gap-3">
                 <Button
                   type="button"
                   variant={!isAdmin ? 'secondary' : 'ghost'}
-                  className={!isAdmin ? 'border-2 border-green-500 bg-green-50 text-green-700' : ''}
+                  className={!isAdmin ? 'btn' : ''}
                   onClick={() => setIsAdmin(false)}
                 >
                   <div className="text-center w-full">
@@ -192,7 +198,7 @@ function AuthRegister() {
                 <Button
                   type="button"
                   variant={isAdmin ? 'secondary' : 'ghost'}
-                  className={isAdmin ? 'border-2 border-green-500 bg-green-50 text-green-700' : ''}
+                  className={isAdmin ? 'btn' : ''}
                   onClick={() => setIsAdmin(true)}
                 >
                   <div className="text-center w-full">
@@ -204,7 +210,7 @@ function AuthRegister() {
               </div>
             </div>
 
-            <Button type="submit" className="w-full mt-2" disabled={loading}>
+            <Button type="submit" className="w-full mt-2 btn" disabled={loading}>
               {loading ? (
                 <span className="flex items-center justify-center">
                   <svg
@@ -233,8 +239,8 @@ function AuthRegister() {
               )}
             </Button>
 
-            <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
-              <p className="text-sm text-gray-600 text-center">
+            <div className="p-4 rounded-xl bg-gray-50 dark:bg-[hsl(217_19%_12%)] border border-gray-200 dark:border-[hsl(230_14%_18%)]">
+              <p className="text-sm text-gray-400 text-center">
                 🔒 Your information is secure and encrypted
               </p>
             </div>
