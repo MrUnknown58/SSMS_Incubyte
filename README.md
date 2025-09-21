@@ -356,12 +356,13 @@ The following screenshots demonstrate the working Sweet Shop application with co
 
 ![Authentication Flow 1](screenshots/auth-flow-1.png)
 ![Authentication FLow 2](screenshots/auth-flow-2.png)
-![Dashboard Interface](screenshots/dashboard.png)
-![Admin Panel](screenshots/admin-panel.png)
-![Purchase & Restock](screenshots/purchase-restock.png)
-![Error Handling](screenshots/error-handling.png)
+![Dashboard Interface](screenshots/dashboard-interface.png)
+![Admin Panel 1](screenshots/admin-panel-1.png)
+![Purchase & Restock](screenshots/admin-panel-2.png)
 
-If deployed, view the live app here:
+<!-- ![Error Handling](screenshots/error-handling.png) -->
+
+View the live app here:
 
 **Live Demo:** [https://ssms-incubyte-frontend.vercel.app/](https://ssms-incubyte-frontend.vercel.app/)
 
